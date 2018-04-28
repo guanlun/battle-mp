@@ -16,9 +16,11 @@ export default class GameMenu extends React.Component {
     handleCreateGameButtonClick() {
         request({
             uri: 'http://localhost:4000/createGame',
+            method: 'POST',
             json: {
             }
         }, (err, res, body) => {
+            console.log(body)
             const gameId = body.id;
             window.location = `#/${gameId}`;
         });

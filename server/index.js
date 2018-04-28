@@ -5,12 +5,8 @@ const cors = require('cors')
 
 const ws = new WebSocket.Server({ port: 4001 });
 
-let webSocket = undefined;
-
 ws.on('connection', socket => {
-    console.log('connected!!!');
-
-    webSocket = socket;
+    console.log('websocket connected!!!');
 
     socket.on('close', () => {
         console.log('closed');
@@ -19,13 +15,42 @@ ws.on('connection', socket => {
     socket.on('error', () => {
         console.log('error');
     });
+
+    socket.on('message', dataStr => {
+        const data = JSON.parse(dataStr);
+        if (data.type === 'join') {
+            const gameId = data.payload.gameId;
+            if (!games[gameId]) {
+                games[gameId] = createGame();
+            }
+
+            const currPlayerCount = games[gameId].players.length;
+
+            if (currPlayerCount > 1) {
+                return;
+            } else if (currPlayerCount === 1) {
+                games[gameId].players[0].socket.send(JSON.stringify({ type: 'join' , paylod: { playerIdx: 0 }}));
+                socket.send(JSON.stringify({ type: 'ready', paylod: { playerIdx: 1 } }))
+            }
+
+            games[gameId].players.push({
+                socket,
+            });
+        }
+    });
 });
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const currentGames = [];
+const games = {};
+
+function createGame() {
+    return {
+        players: [],
+    };
+}
 
 function createGameId() {
     let id = '';
@@ -37,19 +62,18 @@ function createGameId() {
         for (let i = 0; i < 6; i++) {
             id += vocab.charAt(Math.floor(Math.random() * vocab.length));
         }
-    } while (currentGames.indexOf(id) !== -1);
+    } while (games[id]);
+
+    games[id] = createGame();
 
     return id;
 }
 
-app.get('/createGame', (req, res) => {
+app.post('/createGame', (req, res) => {
+    console.log(req)
     res.send({
         id: createGameId(),
     });
-
-    // if (webSocket) {
-    //     webSocket.send(req.param('action'));
-    // }
 });
 
 app.listen(4000);
