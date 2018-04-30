@@ -1,6 +1,8 @@
 import React from 'react';
 import request from 'request';
 
+import { SERVER_HOST } from './Constants';
+
 export default class GameMenu extends React.Component {
     render() {
         return (
@@ -15,7 +17,7 @@ export default class GameMenu extends React.Component {
 
     handleCreateGameButtonClick() {
         request({
-            uri: 'http://localhost:4000/createGame',
+            uri: `http://${SERVER_HOST}:4000/createGame`,
             method: 'POST',
             json: {
             }

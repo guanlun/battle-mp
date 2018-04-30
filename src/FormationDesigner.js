@@ -12,7 +12,6 @@ export default class FormationDesigner extends React.Component {
 
     componentDidUpdate() {
         if (this.props.playerIdx !== undefined && this.props.playerIdx !== null && !this.ctx) {
-            console.log(this.refs.designerCanvas)
             this.ctx = this.refs.designerCanvas.getContext('2d');
             this.ctx.fillStyle = 'red';
 

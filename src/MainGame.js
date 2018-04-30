@@ -1,7 +1,7 @@
 import React from 'react';
 
 import FormationDesigner from './FormationDesigner';
-// import BattleField from './BattleField';
+import { SERVER_HOST } from './Constants';
 
 const CROSS_SIZE = 5;
 
@@ -128,7 +128,7 @@ export default class MainGame extends React.Component {
             return;
         }
 
-        this.wsConn = new WebSocket(`ws://localhost:4001`);
+        this.wsConn = new WebSocket(`ws://${SERVER_HOST}:4001`);
 
         this.wsConn.onopen = () => {
             console.log('connected to ws server');
