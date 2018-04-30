@@ -30,6 +30,8 @@ module.exports = class Sword extends Weapon {
         if (this.status === 'out') {
             this.currAttackFrame++;
 
+            this.offsetAngle = Math.PI / 4 * (1 - this.currAttackFrame / 30);
+
             const pointing = facing - this.offsetAngle;
 
             const normalX = Math.cos(pointing);
@@ -63,22 +65,12 @@ module.exports = class Sword extends Weapon {
         }
     }
 
-    render(ctx) {
-        this.offsetAngle = Math.PI / 4 * (1 - this.currAttackFrame / 30);
-        ctx.save();
-        ctx.rotate(this.offsetAngle);
-
-        ctx.beginPath();
-        ctx.moveTo(this.startPos.x, this.startPos.y);
-        ctx.lineTo(this.startPos.x, this.startPos.y - this.length);
-        ctx.quadraticCurveTo(this.startPos.x - 5, this.startPos.y + 3, this.startPos.x, this.startPos.y);
-        ctx.closePath();
-
-        ctx.moveTo(this.startPos.x - 4, this.startPos.y - 2);
-        ctx.lineTo(this.startPos.x + 3, this.startPos.y - 2);
-        ctx.closePath();
-        ctx.stroke();
-
-        ctx.restore();
+    serialize() {
+        return {
+            offsetAngle: this.offsetAngle,
+            currAttackFrame: this.currAttackFrame,
+            startPos: this.startPos,
+            length: this.length,
+        }
     }
 }

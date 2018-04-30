@@ -229,35 +229,6 @@ module.exports = class Soldier {
         this.weapon.render(ctx);
     }
 
-    render(ctx, color) {
-        const {x, y} = this.position;
-
-        ctx.fillStyle = color;
-        ctx.strokeStyle = color;
-
-        ctx.save();
-
-        const facing = Math.atan2(this.facing.y, this.facing.x) + Math.PI / 2;
-        ctx.translate(x, y);
-        ctx.rotate(facing);
-
-        ctx.beginPath();
-        if (this.alive) {
-            this.renderAlive(ctx);
-        } else {
-            ctx.moveTo(-CROSS_SIZE, -CROSS_SIZE);
-            ctx.lineTo(CROSS_SIZE, CROSS_SIZE);
-            ctx.closePath();
-
-            ctx.moveTo(-CROSS_SIZE, CROSS_SIZE);
-            ctx.lineTo(CROSS_SIZE, -CROSS_SIZE);
-            ctx.closePath();
-            ctx.stroke();
-        }
-
-        ctx.restore();
-    }
-
     distTo(soldier) {
         const xDiff = soldier.position.x - this.position.x;
         const yDiff = soldier.position.y - this.position.y;
@@ -300,9 +271,10 @@ module.exports = class Soldier {
     serialize() {
         return {
             alive: this.alive,
-            x: this.position.x,
-            y: this.position.y,
-            // type: this.
+            position: this.position,
+            facing: this.facing,
+            dimension: this.dimension,
+            weapon: this.weapon.serialize(),
         };
     }
 }

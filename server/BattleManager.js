@@ -27,7 +27,7 @@ module.exports = class BattleManager {
     }
 
     startSimulation(cb) {
-        this.gameRuntime = setInterval(this.simulate.bind(this), 30);
+        this.gameRuntime = setInterval(this.simulate.bind(this), 20);
         this.simulationCallback = cb;
     }
 

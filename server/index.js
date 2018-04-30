@@ -62,9 +62,9 @@ function deployFormation(gameId, username, soldiers) {
     if (DEV_SP) { // single player dev mode
         // dummy soldiers for the dev opponent
         game.battleManager.loadSoldiers(1, [
-            { x: 200, y: 100 },
-            { x: 200, y: 200 },
-            { x: 200, y: 300 },
+            // { x: 50, y: 100 },
+            { x: 50, y: 200 },
+            // { x: 50, y: 300 },
         ]);
 
         game.battleManager.startSimulation(battleState => {
