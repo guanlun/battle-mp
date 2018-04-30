@@ -2,6 +2,8 @@ module.exports = class Army {
     constructor(side) {
         this.side = side;
         this.soldiers = [];
+
+        this.loaded = false;
     }
 
     simulate(frame, state) {

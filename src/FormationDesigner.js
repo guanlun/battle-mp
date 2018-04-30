@@ -4,14 +4,15 @@ export default class FormationDesigner extends React.Component {
     constructor() {
         super();
         this.soldiers = [
-            // { x: 300, y: 100 },
+            { x: 300, y: 100 },
             { x: 400, y: 200 },
-            // { x: 300, y: 300 },
+            { x: 300, y: 300 },
         ];
     }
 
     componentDidUpdate() {
-        if (this.props.playerIdx !== undefined && !this.ctx) {
+        if (this.props.playerIdx !== undefined && this.props.playerIdx !== null && !this.ctx) {
+            console.log(this.refs.designerCanvas)
             this.ctx = this.refs.designerCanvas.getContext('2d');
             this.ctx.fillStyle = 'red';
 

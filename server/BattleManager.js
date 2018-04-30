@@ -10,6 +10,8 @@ module.exports = class BattleManager {
         // this.simulating = false;
 
         this.frame = 0;
+
+        this.simulationCallbacks = [];
     }
 
     simulate() {
@@ -23,12 +25,17 @@ module.exports = class BattleManager {
             blue: this.blueArmy.soldiers.map(s => s.serialize()),
         };
 
-        this.simulationCallback(battleState);
+        for (const cb of this.simulationCallbacks) {
+            cb(battleState);
+        }
     }
 
-    startSimulation(cb) {
+    registerCallback(cb) {
+        this.simulationCallbacks.push(cb);
+    }
+
+    startSimulation() {
         this.gameRuntime = setInterval(this.simulate.bind(this), 20);
-        this.simulationCallback = cb;
     }
 
     stopSimulation() {
@@ -42,5 +49,13 @@ module.exports = class BattleManager {
         for (const s of soldierSpecs) {
             army.addSoldier(new Soldier(s.x + xOffset, s.y, 'sword'));
         }
+
+        army.loaded = true;
+    }
+
+    isArmyLoaded(playerIdx) {
+        const army = playerIdx === 0 ? this.redArmy : this.blueArmy;
+
+        return army.loaded;
     }
 }
