@@ -13,51 +13,10 @@ const ws = new WebSocket.Server({ port: 4001 });
 function joinGame(gameId, username, socket) {
     let game = games[gameId];
     if (!game) {
-        games[gameId] = game = createGame();
+        games[gameId] = game = new BattleManager();
     }
 
-    game.players[username] = {
-        socket,
-        soldiers: [],
-        exited: false,
-    };
-
-    if (DEV_SP) { // single player dev mode
-        game.players['DEV_OPPONENT'] = {
-            socket,
-            soldiers: [],
-            playerIdx: 1,
-            exited: false,
-        };
-
-        game.players[username].playerIdx = 0;
-
-        socket.send(JSON.stringify({ type: 'ready', payload: { playerIdx: 0 }}));
-    } else {
-        const opponentPlayer = getOpponentPlayer(game.players, username);
-
-        if (opponentPlayer) {
-            game.players[username].playerIdx = 1;
-            opponentPlayer.socket.send(JSON.stringify({ type: 'ready', payload: { playerIdx: 0 }}));
-            socket.send(JSON.stringify({ type: 'ready', payload: { playerIdx: 1 }}));
-        } else {
-            game.players[username].playerIdx = 0;
-            socket.send(JSON.stringify({ type: 'joined' }))
-        }
-    }
-}
-
-function sendBattleUpdateMsg(battleState, player) {
-    if (!player.exited) {
-        player.socket.send(JSON.stringify({
-            type: 'battleUpdate',
-            payload: { battleState },
-        }), error => {
-            if (error) {
-                player.exited = true;
-            }
-        });
-    }
+    game.addPlayer(username, socket);
 }
 
 function deployFormation(gameId, username, soldiers) {
@@ -67,38 +26,7 @@ function deployFormation(gameId, username, soldiers) {
         return;
     }
 
-    const player = game.players[username]
-
-    if (!player) {
-        return;
-    }
-
-    game.battleManager.loadSoldiers(player.playerIdx, soldiers);
-
-    if (DEV_SP) { // single player dev mode
-        // dummy soldiers for the dev opponent
-        game.battleManager.loadSoldiers(1, [
-            { x: 50, y: 100, type: 'sword' },
-            { x: 50, y: 200, type: 'sword' },
-            { x: 50, y: 300, type: 'sword' },
-        ]);
-
-        game.battleManager.registerCallback(bs => sendBattleUpdateMsg(bs, player));
-
-        game.battleManager.startSimulation();
-    } else {
-        const opponentPlayer = getOpponentPlayer(game.players, username);
-
-        if (game.battleManager.isArmyLoaded(opponentPlayer.playerIdx)) {
-            // Opponent is ready
-            game.battleManager.registerCallback(bs => sendBattleUpdateMsg(bs, player));
-
-            game.battleManager.startSimulation();
-        } else {
-            // Opponent not ready
-            game.battleManager.registerCallback(bs => sendBattleUpdateMsg(bs, player));
-        }
-    }
+    game.deployFormation(username, soldiers);
 }
 
 ws.on('connection', (socket, req) => {
@@ -133,21 +61,6 @@ app.use(bodyParser.json());
 
 const games = {};
 
-function getOpponentPlayer(players, playerId) {
-    for (const pid of Object.keys(players)) {
-        if (pid !== playerId) {
-            return players[pid];
-        }
-    }
-}
-
-function createGame() {
-    return {
-        battleManager: new BattleManager(),
-        players: {},
-    };
-}
-
 function createGameId() {
     let id = '';
 
@@ -159,8 +72,6 @@ function createGameId() {
             id += vocab.charAt(Math.floor(Math.random() * vocab.length));
         }
     } while (games[id]);
-
-    games[id] = createGame();
 
     return id;
 }
