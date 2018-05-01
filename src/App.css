@@ -11,14 +11,44 @@ body {
 }
 
 .formation-designer {
-    float: left;
-}
-
-.designer-section {
-    display: inline;
 }
 
 .designer-canvas {
     box-sizing: border-box;
     border: 1px #ccc solid;
+}
+
+.soldier-selector {
+    margin-top: 10px;
+    display: inline-block;
+    box-sizing: border-box;
+    border: 1px solid #999;
+}
+
+.soldier-selector-option {
+    float: left;
+    padding: 5px 20px;
+    box-sizing: border-box;
+    border-left: 1px solid #999;
+    cursor: pointer;
+}
+
+.soldier-selector-option.active {
+    background: #999;
+    color: white;
+}
+
+.soldier-selector-option:hover {
+    background: #ccc;
+}
+
+.soldier-selector-option:first-child {
+    border-left: none;
+}
+
+.design-sections-container {
+}
+
+.designer-section {
+    display: inline;
 }

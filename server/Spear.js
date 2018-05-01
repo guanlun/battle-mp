@@ -89,4 +89,12 @@ module.exports = class Spear extends Weapon {
 
         ctx.restore();
     }
+
+    serialize() {
+        return {
+            offsetPos: this.offsetPos,
+            startPos: this.startPos,
+            length: this.length,
+        }
+    }
 }

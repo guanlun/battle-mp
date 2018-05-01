@@ -5,8 +5,8 @@ const cors = require('cors');
 
 const BattleManager = require('./BattleManager');
 
-// const DEV_SP = true;
-const DEV_SP = false;
+const DEV_SP = true;
+// const DEV_SP = false;
 
 const ws = new WebSocket.Server({ port: 4001 });
 
@@ -19,6 +19,7 @@ function joinGame(gameId, username, socket) {
     game.players[username] = {
         socket,
         soldiers: [],
+        exited: false,
     };
 
     if (DEV_SP) { // single player dev mode
@@ -26,6 +27,7 @@ function joinGame(gameId, username, socket) {
             socket,
             soldiers: [],
             playerIdx: 1,
+            exited: false,
         };
 
         game.players[username].playerIdx = 0;
@@ -42,6 +44,19 @@ function joinGame(gameId, username, socket) {
             game.players[username].playerIdx = 0;
             socket.send(JSON.stringify({ type: 'joined' }))
         }
+    }
+}
+
+function sendBattleUpdateMsg(battleState, player) {
+    if (!player.exited) {
+        player.socket.send(JSON.stringify({
+            type: 'battleUpdate',
+            payload: { battleState },
+        }), error => {
+            if (error) {
+                player.exited = true;
+            }
+        });
     }
 }
 
@@ -63,17 +78,12 @@ function deployFormation(gameId, username, soldiers) {
     if (DEV_SP) { // single player dev mode
         // dummy soldiers for the dev opponent
         game.battleManager.loadSoldiers(1, [
-            { x: 50, y: 100 },
-            { x: 50, y: 200 },
-            { x: 50, y: 300 },
+            { x: 50, y: 100, type: 'sword' },
+            { x: 50, y: 200, type: 'sword' },
+            { x: 50, y: 300, type: 'sword' },
         ]);
 
-        game.battleManager.registerCallback(battleState => {
-            player.socket.send(JSON.stringify({
-                type: 'battleUpdate',
-                payload: { battleState },
-            }));
-        });
+        game.battleManager.registerCallback(bs => sendBattleUpdateMsg(bs, player));
 
         game.battleManager.startSimulation();
     } else {
@@ -81,22 +91,12 @@ function deployFormation(gameId, username, soldiers) {
 
         if (game.battleManager.isArmyLoaded(opponentPlayer.playerIdx)) {
             // Opponent is ready
-            game.battleManager.registerCallback(battleState => {
-                player.socket.send(JSON.stringify({
-                    type: 'battleUpdate',
-                    payload: { battleState },
-                }));
-            });
+            game.battleManager.registerCallback(bs => sendBattleUpdateMsg(bs, player));
 
             game.battleManager.startSimulation();
         } else {
             // Opponent not ready
-            game.battleManager.registerCallback(battleState => {
-                player.socket.send(JSON.stringify({
-                    type: 'battleUpdate',
-                    payload: { battleState },
-                }));
-            });
+            game.battleManager.registerCallback(bs => sendBattleUpdateMsg(bs, player));
         }
     }
 }
@@ -104,8 +104,8 @@ function deployFormation(gameId, username, soldiers) {
 ws.on('connection', (socket, req) => {
     console.log('websocket connected!!!');
 
-    socket.on('close', () => {
-        console.log('closed');
+    socket.on('close', ($1, $2) => {
+        console.log('closed', $1, $2);
     });
 
     socket.on('error', () => {

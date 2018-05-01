@@ -20,7 +20,7 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "server": "nodemon server/index.js",
-    "prod-env": "echo 'module.exports = { ENV: \"prod\" };' > ./src/env.js",
+    "prod-env": "echo 'module.exports = { ENV: \"prod\" };' > ./src/Env.js",
     "deploy-prod": "sudo cp -r ./build/* /var/www/html/battle/",
     "build-prod": "npm run prod-env; npm run build; npm run deploy-prod"
   }

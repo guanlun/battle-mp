@@ -80,4 +80,10 @@ module.exports = class Shield extends Weapon {
 
         ctx.restore();
     }
+
+    serialize() {
+        return {
+            startPos: this.startPos,
+        }
+    }
 }

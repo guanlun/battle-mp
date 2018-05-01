@@ -1,13 +1,24 @@
 import React from 'react';
 
+const SOLDIER_TYPES = [
+    { weapon: 'sword', displayText: 'Swordsman' },
+    { weapon: 'spear', displayText: 'Spear' },
+    { weapon: 'shield', displayText: 'Shield' },
+    { weapon: 'horse', displayText: 'Horseman' },
+];
+
 export default class FormationDesigner extends React.Component {
     constructor() {
         super();
         this.soldiers = [
-            { x: 300, y: 100 },
-            { x: 400, y: 200 },
-            { x: 300, y: 300 },
+            { x: 300, y: 100, type: 'sword' },
+            { x: 400, y: 200, type: 'sword' },
+            { x: 300, y: 300, type: 'sword' },
         ];
+
+        this.state = {
+            activeSoldierType: 'sword',
+        }
     }
 
     componentDidUpdate() {
@@ -23,14 +34,30 @@ export default class FormationDesigner extends React.Component {
 
     render() {
         const { playerIdx } = this.props;
+        const { activeSoldierType } = this.state;
 
         const leftSection = (playerIdx === 0) ? this.createDesignerSection() : this.createOpponentSection();
         const rightSection = (playerIdx === 1) ? this.createDesignerSection() : this.createOpponentSection();
 
         return (
             <div className="formation-designer">
-                {leftSection}
-                {rightSection}
+                <div>
+                    <button onClick={this.handleCompleteFormationButtonClick.bind(this)}>Complete Formation</button>
+                </div>
+                <div className="soldier-selector">
+                    {SOLDIER_TYPES.map(st => (
+                        <div
+                            key={`soldier-type-${st.weapon}`}
+                            className={`soldier-selector-option ${st.weapon === activeSoldierType ? 'active' : ''}`}
+                            onClick={() => this.handleSoldierTypeSelect(st.weapon)}>
+                            {st.displayText}
+                        </div>
+                    ))}
+                </div>
+                <div className="design-sections-container">
+                    {leftSection}
+                    {rightSection}
+                </div>
             </div>
         );
     }
@@ -38,9 +65,6 @@ export default class FormationDesigner extends React.Component {
     createDesignerSection() {
         return (
             <div className="designer-section">
-                <div>
-                    <button onClick={this.handleCompleteFormationButtonClick.bind(this)}>Complete Formation</button>
-                </div>
                 <canvas
                     ref="designerCanvas"
                     className="designer-canvas"
@@ -69,6 +93,14 @@ export default class FormationDesigner extends React.Component {
 
         this.ctx.fillRect(x, y, 10, 10);
 
-        this.soldiers.push({ x, y });
+        this.soldiers.push({
+            x,
+            y,
+            type: this.state.activeSoldierType,
+        });
+    }
+
+    handleSoldierTypeSelect(activeSoldierType) {
+        this.setState({ activeSoldierType });
     }
 }

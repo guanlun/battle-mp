@@ -4,6 +4,8 @@ const Horseman = require('./Horseman');
 
 module.exports = class BattleManager {
     constructor() {
+        this.players = [];
+
         this.redArmy = new Army('red');
         this.blueArmy = new Army('blue');
         this.obstacles = [];
@@ -47,7 +49,7 @@ module.exports = class BattleManager {
         const xOffset = playerIdx === 0 ? 0 : 400;
 
         for (const s of soldierSpecs) {
-            army.addSoldier(new Soldier(s.x + xOffset, s.y, 'sword'));
+            army.addSoldier(new Soldier(s.x + xOffset, s.y, s.type));
         }
 
         army.loaded = true;
