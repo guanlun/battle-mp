@@ -1,4 +1,5 @@
 import React from 'react';
+import { renderSoldier } from './SoldierRenderer';
 
 const SOLDIER_TYPES = [
     { weapon: 'sword', displayText: 'Swordsman' },
@@ -24,12 +25,37 @@ export default class FormationDesigner extends React.Component {
     componentDidUpdate() {
         if (this.props.playerIdx !== undefined && this.props.playerIdx !== null && !this.ctx) {
             this.ctx = this.refs.designerCanvas.getContext('2d');
-            this.ctx.fillStyle = 'red';
 
             for (const s of this.soldiers) {
-                this.ctx.fillRect(s.x, s.y, 10, 10);
+                this.renderSoidierAdpter(s);
             }
         }
+    }
+
+    renderSoidierAdpter(soldier) {
+        const soldierSpec = {
+            position: {
+                x: soldier.x,
+                y: soldier.y,
+            },
+            facing: {
+                x: 0,
+                y: -1,
+            },
+            dimension: 5,
+            alive: true,
+            weapon: {
+                offsetAngle: Math.PI / 4,
+                currAttackFrame: 0,
+                startPos: {
+                    x: 2,
+                    y: -5,
+                },
+                length: 20,
+            }
+        };
+
+        renderSoldier(this.ctx, soldierSpec, 'red');
     }
 
     render() {
@@ -91,13 +117,15 @@ export default class FormationDesigner extends React.Component {
         const x = evt.nativeEvent.offsetX;
         const y = evt.nativeEvent.offsetY;
 
-        this.ctx.fillRect(x, y, 10, 10);
-
-        this.soldiers.push({
+        const soldier = {
             x,
             y,
             type: this.state.activeSoldierType,
-        });
+        }
+
+        this.renderSoidierAdpter(soldier);
+
+        this.soldiers.push(soldier);
     }
 
     handleSoldierTypeSelect(activeSoldierType) {
