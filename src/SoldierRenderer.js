@@ -14,10 +14,11 @@ export function renderSoldier(ctx, soldier, color) {
 
     ctx.beginPath();
     if (soldier.alive) {
-        ctx.arc(0, 0, soldier.dimension, 0, Math.PI * 2);
-        ctx.fill();
-
-        renderWeapon(ctx, soldier.weapon);
+        if (soldier.weapon.type === 'horse') {
+            renderHorseman(ctx, soldier);
+        } else {
+            renderFootman(ctx, soldier);
+        }
     } else {
         ctx.moveTo(-CROSS_SIZE, -CROSS_SIZE);
         ctx.lineTo(CROSS_SIZE, CROSS_SIZE);
@@ -30,6 +31,25 @@ export function renderSoldier(ctx, soldier, color) {
     }
 
     ctx.restore();
+}
+
+function renderHorseman(ctx, horseman) {
+    ctx.beginPath();
+
+    ctx.moveTo(0, -15);
+    ctx.lineTo(10, 15);
+    ctx.lineTo(-10, 15);
+
+    ctx.closePath();
+
+    ctx.fill();
+}
+
+function renderFootman(ctx, footman) {
+    ctx.arc(0, 0, footman.dimension, 0, Math.PI * 2);
+    ctx.fill();
+
+    renderWeapon(ctx, footman.weapon);
 }
 
 function renderWeapon(ctx, weapon) {

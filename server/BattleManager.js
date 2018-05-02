@@ -129,7 +129,11 @@ module.exports = class BattleManager {
         const xOffset = playerIdx === 0 ? 0 : 650;
 
         for (const s of soldierSpecs) {
-            army.addSoldier(new Soldier(s.x + xOffset, s.y, s.type));
+            if (s.type === 'horse') {
+                army.addSoldier(new Horseman(s.x + xOffset, s.y));
+            } else {
+                army.addSoldier(new Soldier(s.x + xOffset, s.y, s.type));
+            }
         }
 
         army.loaded = true;

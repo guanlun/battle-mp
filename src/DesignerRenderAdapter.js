@@ -27,6 +27,10 @@ const WEAPON_SPEC = {
             y: -5,
         },
     },
+    horse: {
+        type: 'horse',
+
+    },
 }
 
 export function renderSoidierAdpter(ctx, soldier, side) {
@@ -44,5 +48,5 @@ export function renderSoidierAdpter(ctx, soldier, side) {
         weapon: WEAPON_SPEC[soldier.type],
     };
 
-    renderSoldier(ctx, soldierSpec, 'red');
+    renderSoldier(ctx, soldierSpec, side);
 }

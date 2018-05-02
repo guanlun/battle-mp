@@ -223,4 +223,16 @@ module.exports = class Horseman extends Soldier {
 
         ctx.fill();
     }
+
+    serialize() {
+        return {
+            alive: this.alive,
+            position: this.position,
+            facing: this.facing,
+            dimension: this.dimension,
+            weapon: {
+                type: 'horse',
+            },
+        };
+    }
 }
