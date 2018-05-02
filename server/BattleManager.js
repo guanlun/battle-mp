@@ -3,6 +3,7 @@ const Soldier = require('./Soldier');
 const Horseman = require('./Horseman');
 
 const DEV_SP = true;
+// const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {
@@ -29,13 +30,13 @@ module.exports = class BattleManager {
             this.players['DEV_OPPONENT'] = {
                 socket: null,
                 soldiers: [],
-                playerIdx: 1,
+                playerIdx: 0,
                 exited: false,
             };
 
-            this.players[username].playerIdx = 0;
+            this.players[username].playerIdx = 1;
 
-            socket.send(JSON.stringify({ type: 'ready', payload: { playerIdx: 0 }}));
+            socket.send(JSON.stringify({ type: 'ready', payload: { playerIdx: 1 }}));
         } else {
             const opponentPlayer = this.getOpponentPlayer(username);
 
@@ -61,26 +62,18 @@ module.exports = class BattleManager {
 
         if (DEV_SP) { // single player dev mode
             // dummy soldiers for the dev opponent
-            this.loadSoldiers(1, [
+            this.loadSoldiers(0, [
                 { x: 50, y: 100, type: 'sword' },
                 { x: 50, y: 200, type: 'sword' },
                 { x: 50, y: 300, type: 'sword' },
             ]);
-
-            // this.registerCallback(bs => sendBattleUpdateMsg(bs, player));
 
             this.startSimulation();
         } else {
             const opponentPlayer = this.getOpponentPlayer(username);
 
             if (this.isArmyLoaded(opponentPlayer.playerIdx)) {
-                // Opponent is ready
-                // this.registerCallback(bs => sendBattleUpdateMsg(bs, player));
-
                 this.startSimulation();
-            } else {
-                // Opponent not ready
-                // this.registerCallback(bs => sendBattleUpdateMsg(bs, player));
             }
         }
     }
@@ -133,7 +126,7 @@ module.exports = class BattleManager {
 
     loadSoldiers(playerIdx, soldierSpecs) {
         const army = playerIdx === 0 ? this.redArmy : this.blueArmy;
-        const xOffset = playerIdx === 0 ? 0 : 400;
+        const xOffset = playerIdx === 0 ? 0 : 650;
 
         for (const s of soldierSpecs) {
             army.addSoldier(new Soldier(s.x + xOffset, s.y, s.type));

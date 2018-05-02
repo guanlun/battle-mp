@@ -33,18 +33,57 @@ export function renderSoldier(ctx, soldier, color) {
 }
 
 function renderWeapon(ctx, weapon) {
-    weapon.offsetAngle = Math.PI / 4 * (1 - weapon.currAttackFrame / 30);
+    switch (weapon.type) {
+        case 'sword':
+            renderSword(ctx, weapon);
+            break;
+        case 'spear':
+            renderSpear(ctx, weapon);
+            break;
+        case 'shield':
+            renderShield(ctx, weapon);
+            break;
+    }
+}
+
+function renderSword(ctx, weaponSpec) {
+    weaponSpec.offsetAngle = Math.PI / 4 * (1 - weaponSpec.currAttackFrame / 30);
     ctx.save();
-    ctx.rotate(weapon.offsetAngle);
+    ctx.rotate(weaponSpec.offsetAngle);
 
     ctx.beginPath();
-    ctx.moveTo(weapon.startPos.x, weapon.startPos.y);
-    ctx.lineTo(weapon.startPos.x, weapon.startPos.y - weapon.length);
-    ctx.quadraticCurveTo(weapon.startPos.x - 5, weapon.startPos.y + 3, weapon.startPos.x, weapon.startPos.y);
+    ctx.moveTo(weaponSpec.startPos.x, weaponSpec.startPos.y);
+    ctx.lineTo(weaponSpec.startPos.x, weaponSpec.startPos.y - weaponSpec.length);
+    ctx.quadraticCurveTo(weaponSpec.startPos.x - 5, weaponSpec.startPos.y + 3, weaponSpec.startPos.x, weaponSpec.startPos.y);
     ctx.closePath();
 
-    ctx.moveTo(weapon.startPos.x - 4, weapon.startPos.y - 2);
-    ctx.lineTo(weapon.startPos.x + 3, weapon.startPos.y - 2);
+    ctx.moveTo(weaponSpec.startPos.x - 4, weaponSpec.startPos.y - 2);
+    ctx.lineTo(weaponSpec.startPos.x + 3, weaponSpec.startPos.y - 2);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+function renderSpear(ctx, weaponSpec) {
+    ctx.save();
+    ctx.translate(0, weaponSpec.offsetPos);
+
+    ctx.beginPath();
+    ctx.moveTo(weaponSpec.startPos.x, weaponSpec.startPos.y - weaponSpec.length);
+    ctx.lineTo(weaponSpec.startPos.x, weaponSpec.startPos.y);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+function renderShield(ctx, weaponSpec) {
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.moveTo(weaponSpec.startPos.x, weaponSpec.startPos.y);
+    ctx.lineTo(weaponSpec.startPos.x + 16, weaponSpec.startPos.y);
     ctx.closePath();
     ctx.stroke();
 

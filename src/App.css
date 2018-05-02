@@ -13,9 +13,28 @@ body {
 .formation-designer {
 }
 
-.designer-canvas {
+.design-sections-container {
+}
+
+.designer-section {
+    float: left;
+    width: 600px;
+    height: 600px;
     box-sizing: border-box;
     border: 1px #ccc solid;
+    margin-right: 50px;
+}
+
+.designer-opponent-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: #666;
+}
+
+.designer-canvas {
+
 }
 
 .soldier-selector {
@@ -46,9 +65,3 @@ body {
     border-left: none;
 }
 
-.design-sections-container {
-}
-
-.designer-section {
-    display: inline;
-}

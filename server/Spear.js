@@ -92,6 +92,7 @@ module.exports = class Spear extends Weapon {
 
     serialize() {
         return {
+            type: this.type,
             offsetPos: this.offsetPos,
             startPos: this.startPos,
             length: this.length,

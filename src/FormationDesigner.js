@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderSoldier } from './SoldierRenderer';
+import { renderSoidierAdpter } from './DesignerRenderAdapter';
 
 const SOLDIER_TYPES = [
     { weapon: 'sword', displayText: 'Swordsman' },
@@ -11,11 +11,7 @@ const SOLDIER_TYPES = [
 export default class FormationDesigner extends React.Component {
     constructor() {
         super();
-        this.soldiers = [
-            { x: 300, y: 100, type: 'sword' },
-            { x: 400, y: 200, type: 'sword' },
-            { x: 300, y: 300, type: 'sword' },
-        ];
+        this.soldiers = [];
 
         this.state = {
             activeSoldierType: 'sword',
@@ -25,37 +21,7 @@ export default class FormationDesigner extends React.Component {
     componentDidUpdate() {
         if (this.props.playerIdx !== undefined && this.props.playerIdx !== null && !this.ctx) {
             this.ctx = this.refs.designerCanvas.getContext('2d');
-
-            for (const s of this.soldiers) {
-                this.renderSoidierAdpter(s);
-            }
         }
-    }
-
-    renderSoidierAdpter(soldier) {
-        const soldierSpec = {
-            position: {
-                x: soldier.x,
-                y: soldier.y,
-            },
-            facing: {
-                x: 0,
-                y: -1,
-            },
-            dimension: 5,
-            alive: true,
-            weapon: {
-                offsetAngle: Math.PI / 4,
-                currAttackFrame: 0,
-                startPos: {
-                    x: 2,
-                    y: -5,
-                },
-                length: 20,
-            }
-        };
-
-        renderSoldier(this.ctx, soldierSpec, 'red');
     }
 
     render() {
@@ -103,8 +69,8 @@ export default class FormationDesigner extends React.Component {
 
     createOpponentSection() {
         return (
-            <div className="designer-section">
-                opponent
+            <div className="designer-section designer-opponent-section">
+                Opponent Army
             </div>
         )
     }
@@ -117,13 +83,15 @@ export default class FormationDesigner extends React.Component {
         const x = evt.nativeEvent.offsetX;
         const y = evt.nativeEvent.offsetY;
 
+        const side = this.props.playerIdx === 0 ? 'red' : 'blue';
+
         const soldier = {
             x,
             y,
             type: this.state.activeSoldierType,
         }
 
-        this.renderSoidierAdpter(soldier);
+        renderSoidierAdpter(this.ctx, soldier, side);
 
         this.soldiers.push(soldier);
     }

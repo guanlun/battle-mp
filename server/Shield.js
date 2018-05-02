@@ -83,6 +83,7 @@ module.exports = class Shield extends Weapon {
 
     serialize() {
         return {
+            type: this.type,
             startPos: this.startPos,
         }
     }

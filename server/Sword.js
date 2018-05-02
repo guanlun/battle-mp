@@ -67,6 +67,7 @@ module.exports = class Sword extends Weapon {
 
     serialize() {
         return {
+            type: this.type,
             offsetAngle: this.offsetAngle,
             currAttackFrame: this.currAttackFrame,
             startPos: this.startPos,
