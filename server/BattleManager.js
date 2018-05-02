@@ -2,8 +2,8 @@ const Army = require('./Army');
 const Soldier = require('./Soldier');
 const Horseman = require('./Horseman');
 
-const DEV_SP = true;
-// const DEV_SP = false;
+// const DEV_SP = true;
+const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {
@@ -97,12 +97,16 @@ module.exports = class BattleManager {
             blue: this.blueArmy.soldiers.map(s => s.serialize()),
         };
 
+        this.broadcast('battleUpdate', { battleState });
+    }
+
+    broadcast(type, payload) {
         for (const username of Object.keys(this.players)) {
             const player = this.players[username];
             if (!player.exited && player.socket) {
                 player.socket.send(JSON.stringify({
-                    type: 'battleUpdate',
-                    payload: { battleState },
+                    type,
+                    payload,
                 }), error => {
                     if (error) {
                         player.exited = true;
@@ -112,11 +116,8 @@ module.exports = class BattleManager {
         }
     }
 
-    registerCallback(cb) {
-        this.simulationCallbacks.push(cb);
-    }
-
     startSimulation() {
+        this.broadcast('battleStarted');
         this.gameRuntime = setInterval(this.simulate.bind(this), 20);
     }
 

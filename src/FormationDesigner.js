@@ -8,14 +8,41 @@ const SOLDIER_TYPES = [
     { weapon: 'horse', displayText: 'Horseman' },
 ];
 
+const KEY_CODE_SOLDIER_TYPE_MAPPING = {
+    49: 'sword',
+    50: 'spear',
+    51: 'shield',
+    52: 'horse',
+};
+
+const SOLDIER_PRICE = {
+    sword: 50,
+    spear: 80,
+    shield: 70,
+    horse: 250,
+}
+
 export default class FormationDesigner extends React.Component {
     constructor() {
         super();
         this.soldiers = [];
 
         this.state = {
+            remainingMoney: 3000,
+
             activeSoldierType: 'sword',
-        }
+        };
+    }
+
+    componentDidMount() {
+        document.addEventListener('keydown', event => {
+            const activeSoldierType = KEY_CODE_SOLDIER_TYPE_MAPPING[event.keyCode];
+            if (activeSoldierType) {
+                this.setState({
+                    activeSoldierType,
+                });
+            }
+        });
     }
 
     componentDidUpdate() {
@@ -26,7 +53,7 @@ export default class FormationDesigner extends React.Component {
 
     render() {
         const { playerIdx } = this.props;
-        const { activeSoldierType } = this.state;
+        const { activeSoldierType, remainingMoney } = this.state;
 
         const leftSection = (playerIdx === 0) ? this.createDesignerSection() : this.createOpponentSection();
         const rightSection = (playerIdx === 1) ? this.createDesignerSection() : this.createOpponentSection();
@@ -35,6 +62,7 @@ export default class FormationDesigner extends React.Component {
             <div className="formation-designer">
                 <div>
                     <button onClick={this.handleCompleteFormationButtonClick.bind(this)}>Complete Formation</button>
+                    <div>Remaining money: {remainingMoney}</div>
                 </div>
                 <div className="soldier-selector">
                     {SOLDIER_TYPES.map(st => (
@@ -80,20 +108,29 @@ export default class FormationDesigner extends React.Component {
     }
 
     handleCanvasClick(evt) {
-        const x = evt.nativeEvent.offsetX;
-        const y = evt.nativeEvent.offsetY;
+        const { remainingMoney, activeSoldierType} = this.state;
+        const price = SOLDIER_PRICE[activeSoldierType];
 
-        const side = this.props.playerIdx === 0 ? 'red' : 'blue';
+        if (remainingMoney >= price) {
+            const x = evt.nativeEvent.offsetX;
+            const y = evt.nativeEvent.offsetY;
 
-        const soldier = {
-            x,
-            y,
-            type: this.state.activeSoldierType,
+            const side = this.props.playerIdx === 0 ? 'red' : 'blue';
+
+            const soldier = {
+                x,
+                y,
+                type: activeSoldierType,
+            };
+
+            renderSoidierAdpter(this.ctx, soldier, side);
+
+            this.soldiers.push(soldier);
+
+            this.setState({
+                remainingMoney: remainingMoney - price,
+            });
         }
-
-        renderSoidierAdpter(this.ctx, soldier, side);
-
-        this.soldiers.push(soldier);
     }
 
     handleSoldierTypeSelect(activeSoldierType) {

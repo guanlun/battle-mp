@@ -45,6 +45,9 @@ export default class MainGame extends React.Component {
                         playerIdx={playerIdx}
                         onFormationComplete={this.handleFormationComplete.bind(this)} />
                 </div>
+                <div style={this.displayStyleOfState('deployed')}>
+                    Waiting for the enemy to deploy
+                </div>
                 <div style={this.displayStyleOfState('fighting')}>
                     <canvas ref="battleCanvas" width="1200" height="600" />
                 </div>
@@ -102,7 +105,7 @@ export default class MainGame extends React.Component {
         }));
 
         this.setState({
-            status: 'fighting',
+            status: 'deployed',
         });
     }
 
@@ -118,6 +121,11 @@ export default class MainGame extends React.Component {
                 this.setState({
                     status: 'ready',
                     playerIdx,
+                });
+                break;
+            case 'battleStarted':
+                this.setState({
+                    status: 'fighting',
                 });
                 break;
             case 'battleUpdate':
