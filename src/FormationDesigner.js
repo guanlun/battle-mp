@@ -22,6 +22,9 @@ const SOLDIER_PRICE = {
     horse: 150,
 }
 
+const CANVAS_WIDTH = 600;
+const CANVAS_HEIGHT = 600;
+
 export default class FormationDesigner extends React.Component {
     constructor() {
         super();
@@ -29,8 +32,8 @@ export default class FormationDesigner extends React.Component {
 
         this.state = {
             remainingMoney: 3000,
-
             activeSoldierType: 'sword',
+            savedFormations: [],
         };
     }
 
@@ -48,12 +51,23 @@ export default class FormationDesigner extends React.Component {
     componentDidUpdate() {
         if (this.props.playerIdx !== undefined && this.props.playerIdx !== null && !this.ctx) {
             this.ctx = this.refs.designerCanvas.getContext('2d');
+
+            const savedFormations = this.loadSavedFormations();
+            if (savedFormations.length > 0) {
+                this.soldiers = savedFormations[savedFormations.length - 1];
+            }
+
+            this.setState({
+                savedFormations,
+            })
+
+            this.renderCurrentFormation();
         }
     }
 
     render() {
         const { playerIdx } = this.props;
-        const { activeSoldierType, remainingMoney } = this.state;
+        const { activeSoldierType, remainingMoney, savedFormations } = this.state;
 
         const leftSection = (playerIdx === 0) ? this.createDesignerSection() : this.createOpponentSection();
         const rightSection = (playerIdx === 1) ? this.createDesignerSection() : this.createOpponentSection();
@@ -74,6 +88,23 @@ export default class FormationDesigner extends React.Component {
                         </div>
                     ))}
                 </div>
+                <div className="designer-adv-control">
+                    <button onClick={this.handleSaveFormationButtonClick.bind(this)}>Save Formation</button>
+                    <div className="designer-load-formation">
+                        <div>Load Formation</div>
+                        <div className="saved-formation-list">
+                            {savedFormations.map((formation, idx) => (
+                                <div
+                                    key={`saved-formation-${idx}`}
+                                    className="saved-formation-item"
+                                    onClick={() => this.handleLoadFormationClick(formation)}>
+                                    <div className="formation-summary-text">{this.summarizeFormation(formation)}</div>
+                                    <div className="formation-delete-btn">x</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
                 <div className="design-sections-container">
                     {leftSection}
                     {rightSection}
@@ -88,11 +119,11 @@ export default class FormationDesigner extends React.Component {
                 <canvas
                     ref="designerCanvas"
                     className="designer-canvas"
-                    width="600"
-                    height="600"
+                    width={CANVAS_WIDTH}
+                    height={CANVAS_HEIGHT}
                     onClick={this.handleCanvasClick.bind(this)} />
             </div>
-        )
+        );
     }
 
     createOpponentSection() {
@@ -100,7 +131,14 @@ export default class FormationDesigner extends React.Component {
             <div className="designer-section designer-opponent-section">
                 Opponent Army
             </div>
-        )
+        );
+    }
+
+    renderCurrentFormation() {
+        this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        for (const s of this.soldiers) {
+            renderSoidierAdpter(this.ctx, s, this.props.playerIdx === 0 ? 'red' : 'blue');
+        }
     }
 
     handleCompleteFormationButtonClick() {
@@ -135,5 +173,50 @@ export default class FormationDesigner extends React.Component {
 
     handleSoldierTypeSelect(activeSoldierType) {
         this.setState({ activeSoldierType });
+    }
+
+    handleSaveFormationButtonClick() {
+        // TODO: optimize storage space
+        if (this.soldiers.length === 0) {
+            return;
+        }
+
+        const formations = this.loadSavedFormations();
+        formations.push(this.soldiers);
+
+        window.localStorage.setItem('formations', JSON.stringify(formations));
+    }
+
+    handleLoadFormationClick(formation) {
+        this.soldiers = formation;
+        this.renderCurrentFormation();
+    }
+
+    loadSavedFormations() {
+        const savedFormationStr = window.localStorage.getItem('formations');
+        return savedFormationStr ? JSON.parse(savedFormationStr) : [];
+    }
+
+    summarizeFormation(formation) {
+        const typeCount = {};
+        for (const soldier of formation) {
+            if (typeCount[soldier.type]) {
+                typeCount[soldier.type]++;
+            } else {
+                typeCount[soldier.type] = 1;
+            }
+        }
+
+        let summary = '';
+
+        for (const type of SOLDIER_TYPES) {
+            const numInType = typeCount[type.weapon];
+
+            if (numInType > 0) {
+                summary += `${type.displayText} x ${numInType}  `;
+            }
+        }
+
+        return summary;
     }
 }

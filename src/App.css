@@ -37,6 +37,48 @@ body {
 
 }
 
+.designer-load-formation {
+
+}
+
+.saved-formation-list {
+    display: none;
+}
+
+.designer-load-formation:hover .saved-formation-list {
+    display: block;
+    position: absolute;
+    background: white;
+    box-shadow: 0 0 4px #999;
+    cursor: pointer;
+}
+
+.saved-formation-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 20px;
+}
+
+.saved-formation-item:hover {
+    background: beige;
+}
+
+.formation-delete-btn {
+    margin-left: 30px;
+    opacity: 0;
+    border-radius: 10px;
+    padding: 0 10px;
+}
+
+.formation-delete-btn:hover {
+    color: white;
+    background: #999;
+}
+
+.saved-formation-item:hover .formation-delete-btn  {
+    opacity: 1;
+}
+
 .soldier-selector {
     margin-top: 10px;
     display: inline-block;
