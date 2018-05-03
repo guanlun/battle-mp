@@ -10,13 +10,26 @@ export default class MainGame extends React.Component {
         this.state = {
             status: 'none',
             playerIdx: null,
+            opponentName: '',
         };
     }
 
     componentDidMount() {
+        this.wsConn = new WebSocket(`ws://${SERVER_HOST}:4001`);
+        this.wsConn.onopen = () => {
+            console.log('connected to ws server');
+        }
+
         this.refs.usernameInput.value = 'test1';
 
         this.ctx = this.refs.battleCanvas.getContext('2d');
+
+        window.onbeforeunload = () => {
+            this.wsConn.send(JSON.stringify({
+                type: 'exit',
+                payload: { gameId: this.props.match.params.gameId, username: this.username },
+            }));
+        }
     }
 
     displayStyleOfState(...status) {
@@ -26,8 +39,7 @@ export default class MainGame extends React.Component {
     }
 
     render() {
-        const { status, playerIdx, battleState } = this.state;
-        console.log(status)
+        const { status, playerIdx, opponentName, battleState } = this.state;
 
         return (
             <div>
@@ -44,6 +56,7 @@ export default class MainGame extends React.Component {
                 <div style={this.displayStyleOfState('ready')}>
                     <FormationDesigner
                         playerIdx={playerIdx}
+                        opponentName={opponentName}
                         onFormationComplete={this.handleFormationComplete.bind(this)} />
                 </div>
                 <div style={this.displayStyleOfState('deployed')}>
@@ -82,16 +95,10 @@ export default class MainGame extends React.Component {
             return;
         }
 
-        this.wsConn = new WebSocket(`ws://${SERVER_HOST}:4001`);
-
-        this.wsConn.onopen = () => {
-            console.log('connected to ws server');
-
-            this.wsConn.send(JSON.stringify({
-                type: 'join',
-                payload: { gameId, username: this.username },
-            }));
-        }
+        this.wsConn.send(JSON.stringify({
+            type: 'join',
+            payload: { gameId, username: this.username },
+        }));
 
         this.wsConn.onmessage = event => {
             const data = JSON.parse(event.data);
@@ -136,10 +143,24 @@ export default class MainGame extends React.Component {
                 });
                 break;
             case 'ready':
-                const playerIdx = msg.payload.playerIdx;
                 this.setState({
                     status: 'ready',
-                    playerIdx,
+                    playerIdx: msg.payload.playerIdx,
+                    opponentName: msg.payload.opponentName,
+                });
+                break;
+            case 'duplicatedPlayer':
+                alert('This username has been taken');
+                break;
+            case 'maxPlayerNum':
+                alert('Max player number reached');
+                break;
+            case 'opponentExit':
+                alert('opponent left')
+                break;
+            case 'rejoin':
+                this.setState({
+                    status: 'fighting',
                 });
                 break;
             case 'battleStarted':

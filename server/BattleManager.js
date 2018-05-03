@@ -2,8 +2,8 @@ const Army = require('./Army');
 const Soldier = require('./Soldier');
 const Horseman = require('./Horseman');
 
-const DEV_SP = true;
-// const DEV_SP = false;
+// const DEV_SP = true;
+const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {
@@ -13,6 +13,7 @@ module.exports = class BattleManager {
     }
 
     reload() {
+        this.ongoing = false;
         this.redArmy = new Army('red');
         this.blueArmy = new Army('blue');
         this.obstacles = [];
@@ -33,13 +34,45 @@ module.exports = class BattleManager {
         }
     }
 
-    addPlayer(username, socket) {
-        if (this.players[username]) {
-            // already in game
-            return;
+    playerExit(username) {
+        const player = this.players[username];
+        if (player) {
+            player.exited = true;
         }
 
-        const player = this.players[username] = {
+        const opponent = this.getOpponentPlayer(username);
+        this.sendMessage(opponent, 'opponentExit');
+    }
+
+    addPlayer(username, socket) {
+        let player = this.players[username];
+        if (player) {
+            if (player.exited) {
+                player.socket = socket;
+                player.exited = false;
+                player.ended = false;
+
+                const opponent = this.getOpponentPlayer(username);
+                if (this.ongoing) {
+                    this.sendMessage(player, 'rejoin', { playerIdx: player.playerIdx, opponentName: opponent.username });
+                } else {
+                    this.sendMessage(player, 'ready', { playerIdx: player.playerIdx, opponentName: opponent.username });
+                }
+            } else {
+                socket.send(JSON.stringify({ type: 'duplicatedPlayer' }));
+            }
+
+            return;
+        } else {
+            // player with this username does not exist
+            if (Object.keys(this.players).length >= 2) {
+                socket.send(JSON.stringify({ type: 'maxPlayerNum'}))
+                return;
+            }
+        }
+
+        this.players[username] = player = {
+            username,
             socket,
             soldiers: [],
             exited: false,
@@ -48,6 +81,7 @@ module.exports = class BattleManager {
 
         if (DEV_SP) { // single player dev mode
             this.players['DEV_OPPONENT'] = {
+                username: 'DEV_OPPONENT',
                 socket: null,
                 soldiers: [],
                 playerIdx: 0,
@@ -57,14 +91,14 @@ module.exports = class BattleManager {
 
             player.playerIdx = 1;
 
-            this.sendMessage(player, 'ready', { playerIdx: 1 });
+            this.sendMessage(player, 'ready', { playerIdx: 1, opponentName: 'DEV_OPPONENT' });
         } else {
             const opponentPlayer = this.getOpponentPlayer(username);
 
             if (opponentPlayer) {
                 player.playerIdx = 1;
-                this.sendMessage(opponentPlayer, 'ready', { playerIdx: 0 });
-                this.sendMessage(player, 'ready', { playerIdx: 1 });
+                this.sendMessage(opponentPlayer, 'ready', { playerIdx: 0, opponentName: username });
+                this.sendMessage(player, 'ready', { playerIdx: 1, opponentName: opponentPlayer.username });
             } else {
                 player.playerIdx = 0;
                 this.sendMessage(player, 'joined');
@@ -145,6 +179,7 @@ module.exports = class BattleManager {
     startSimulation() {
         this.broadcast('battleStarted');
         this.gameRuntime = setInterval(this.simulate.bind(this), 20);
+        this.ongoing = true;
     }
 
     stopSimulation() {
@@ -156,6 +191,11 @@ module.exports = class BattleManager {
     }
 
     sendMessage(player, type, payload = {}) {
+        if (!player.socket) {
+            console.log(`Player ${player.username}'s socket is undefined`)
+            return;
+        }
+
         player.socket.send(JSON.stringify({
             type,
             payload,

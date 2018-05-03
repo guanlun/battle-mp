@@ -42,7 +42,7 @@ module.exports = class Soldier {
         switch (weaponType) {
             case 'sword':
                 this.weapon = new Sword();
-                this.maxMovingSpeed = 1.0;
+                this.maxMovingSpeed = 0.6;
                 break;
             case 'spear':
                 this.weapon = new Spear();

@@ -66,7 +66,7 @@ export default class FormationDesigner extends React.Component {
 
             const savedFormations = this.loadSavedFormations();
             if (savedFormations.length > 0) {
-                this.soldiers = savedFormations[savedFormations.length - 1];
+                this.soldiers = this.transformFormation(savedFormations[savedFormations.length - 1]);
             }
 
             this.setState({
@@ -144,7 +144,7 @@ export default class FormationDesigner extends React.Component {
     createOpponentSection() {
         return (
             <div className="designer-section designer-opponent-section">
-                Opponent Army
+                {this.props.opponentName}'s Army
             </div>
         );
     }
@@ -264,19 +264,33 @@ export default class FormationDesigner extends React.Component {
         }
 
         const formations = this.loadSavedFormations();
-        formations.push(this.soldiers);
+        const formation = this.transformFormation(this.soldiers);
+
+        formations.push(formation);
 
         window.localStorage.setItem('formations', JSON.stringify(formations));
     }
 
     handleLoadFormationClick(formation) {
-        this.soldiers = formation;
+        this.soldiers = this.transformFormation(formation);
         this.udpateFormation();
     }
 
     loadSavedFormations() {
-        const savedFormationStr = window.localStorage.getItem('formations');
-        return savedFormationStr ? JSON.parse(savedFormationStr) : [];
+        const savedFormations = JSON.parse(window.localStorage.getItem('formations'));
+        if (Array.isArray(savedFormations)) {
+            return savedFormations;
+        } else {
+            return [];
+        }
+    }
+
+    transformFormation(formation) {
+        return formation.map(s => ({
+            x: (this.props.playerIdx === 0) ? s.x : CANVAS_WIDTH - s.x, // reverse formation as blue army
+            y: s.y,
+            type: s.type,
+        }));
     }
 
     summarizeFormation(formation) {

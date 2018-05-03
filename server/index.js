@@ -19,6 +19,16 @@ function joinGame(gameId, username, socket) {
     game.addPlayer(username, socket);
 }
 
+function exitGame(gameId, username) {
+    const game = games[gameId];
+
+    if (!game) {
+        return;
+    }
+
+    game.playerExit(username);
+}
+
 function rematch(gameId, username) {
     const game = games[gameId];
 
@@ -54,13 +64,14 @@ ws.on('connection', (socket, req) => {
         const data = JSON.parse(dataStr);
 
         const clientIP = req.connection.remoteAddress;
-        console.log(clientIP)
-
         const { gameId, username } = data.payload;
 
         switch (data.type) {
             case 'join':
                 joinGame(gameId, username, socket);
+                break;
+            case 'exit':
+                exitGame(gameId, username);
                 break;
             case 'formationComplete':
                 const { soldiers } = data.payload;
