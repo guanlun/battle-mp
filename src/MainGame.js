@@ -19,14 +19,15 @@ export default class MainGame extends React.Component {
         this.ctx = this.refs.battleCanvas.getContext('2d');
     }
 
-    displayStyleOfState(status) {
+    displayStyleOfState(...status) {
         return {
-            display: (this.state.status === status) ? 'block' : 'none',
+            display: (status.indexOf(this.state.status) !== -1) ? 'block' : 'none',
         };
     }
 
     render() {
         const { status, playerIdx, battleState } = this.state;
+        console.log(status)
 
         return (
             <div>
@@ -48,8 +49,14 @@ export default class MainGame extends React.Component {
                 <div style={this.displayStyleOfState('deployed')}>
                     Waiting for the enemy to deploy
                 </div>
-                <div style={this.displayStyleOfState('fighting')}>
+                <div style={this.displayStyleOfState('fighting', 'ended')}>
                     <canvas ref="battleCanvas" width="1200" height="600" />
+                    <div style={this.displayStyleOfState('ended')}>
+                        <div className="game-ended-overlay">
+                            Game Ended
+                            <button onClick={this.handleRematchButtonClick.bind(this)}>Rematch</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         )
@@ -109,6 +116,18 @@ export default class MainGame extends React.Component {
         });
     }
 
+    handleRematchButtonClick() {
+        const gameId = this.props.match.params.gameId;
+
+        this.wsConn.send(JSON.stringify({
+            type: 'rematch',
+            payload: {
+                gameId,
+                username: this.username,
+            },
+        }));
+    }
+
     processWebSocketMessage(msg) {
         switch (msg.type) {
             case 'joined':
@@ -132,6 +151,17 @@ export default class MainGame extends React.Component {
                 const battleState = msg.payload.battleState;
 
                 this.updateBattleState(battleState);
+                break;
+            case 'ended':
+                this.setState({
+                    status: 'ended',
+                    winner: msg.payload.winner,
+                });
+                break;
+            case 'rematchReady':
+                this.setState({
+                    status: 'ready',
+                });
                 break;
         }
     }

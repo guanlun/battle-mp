@@ -19,7 +19,7 @@ const SOLDIER_PRICE = {
     sword: 50,
     spear: 80,
     shield: 70,
-    horse: 250,
+    horse: 150,
 }
 
 export default class FormationDesigner extends React.Component {

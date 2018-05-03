@@ -19,6 +19,16 @@ function joinGame(gameId, username, socket) {
     game.addPlayer(username, socket);
 }
 
+function rematch(gameId, username) {
+    const game = games[gameId];
+
+    if (!game) {
+        return;
+    }
+
+    game.rematch(username);
+}
+
 function deployFormation(gameId, username, soldiers) {
     const game = games[gameId];
 
@@ -45,12 +55,19 @@ ws.on('connection', (socket, req) => {
 
         const clientIP = req.connection.remoteAddress;
 
-        if (data.type === 'join') {
-            const { gameId, username } = data.payload;
-            joinGame(gameId, username, socket);
-        } else if (data.type === 'formationComplete') {
-            const { gameId, username, soldiers } = data.payload;
-            deployFormation(gameId, username, soldiers);
+        const { gameId, username } = data.payload;
+
+        switch (data.type) {
+            case 'join':
+                joinGame(gameId, username, socket);
+                break;
+            case 'formationComplete':
+                const { soldiers } = data.payload;
+                deployFormation(gameId, username, soldiers);
+                break;
+            case 'rematch':
+                rematch(gameId, username);
+                break;
         }
     });
 });

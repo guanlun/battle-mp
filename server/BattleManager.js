@@ -2,28 +2,43 @@ const Army = require('./Army');
 const Soldier = require('./Soldier');
 const Horseman = require('./Horseman');
 
-// const DEV_SP = true;
-const DEV_SP = false;
+const DEV_SP = true;
+// const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {
         this.players = {};
 
+        this.reload();
+    }
+
+    reload() {
         this.redArmy = new Army('red');
         this.blueArmy = new Army('blue');
         this.obstacles = [];
-        // this.simulating = false;
-
         this.frame = 0;
+    }
 
-        this.simulationCallbacks = [];
+    rematch(username) {
+        this.players[username].ended = false;
+
+        const opponentPlayer = this.getOpponentPlayer(username);
+
+        if (DEV_SP) {
+            opponentPlayer.ended = false;
+        }
+
+        if (!opponentPlayer.ended) {
+            this.broadcast('rematchReady');
+        }
     }
 
     addPlayer(username, socket) {
-        this.players[username] = {
+        const player = this.players[username] = {
             socket,
             soldiers: [],
             exited: false,
+            ended: false,
         };
 
         if (DEV_SP) { // single player dev mode
@@ -32,21 +47,22 @@ module.exports = class BattleManager {
                 soldiers: [],
                 playerIdx: 0,
                 exited: false,
+                ended: false,
             };
 
-            this.players[username].playerIdx = 1;
+            player.playerIdx = 1;
 
-            socket.send(JSON.stringify({ type: 'ready', payload: { playerIdx: 1 }}));
+            this.sendMessage(player, 'ready', { playerIdx: 1 });
         } else {
             const opponentPlayer = this.getOpponentPlayer(username);
 
             if (opponentPlayer) {
-                this.players[username].playerIdx = 1;
-                opponentPlayer.socket.send(JSON.stringify({ type: 'ready', payload: { playerIdx: 0 }}));
-                socket.send(JSON.stringify({ type: 'ready', payload: { playerIdx: 1 }}));
+                player.playerIdx = 1;
+                this.sendMessage(opponentPlayer, 'ready', { playerIdx: 0 });
+                this.sendMessage(player, 'ready', { playerIdx: 1 });
             } else {
-                this.players[username].playerIdx = 0;
-                socket.send(JSON.stringify({ type: 'joined' }))
+                player.playerIdx = 0;
+                this.sendMessage(player, 'joined');
             }
         }
     }
@@ -63,9 +79,9 @@ module.exports = class BattleManager {
         if (DEV_SP) { // single player dev mode
             // dummy soldiers for the dev opponent
             this.loadSoldiers(0, [
-                { x: 50, y: 100, type: 'sword' },
+                // { x: 50, y: 100, type: 'sword' },
                 { x: 50, y: 200, type: 'sword' },
-                { x: 50, y: 300, type: 'sword' },
+                // { x: 50, y: 300, type: 'sword' },
             ]);
 
             this.startSimulation();
@@ -90,6 +106,9 @@ module.exports = class BattleManager {
         this.redArmy.simulate(this.frame, this);
         this.blueArmy.simulate(this.frame, this);
 
+        const redLost = this.redArmy.soldiers.every(s => !s.alive);
+        const blueLost = this.blueArmy.soldiers.every(s => !s.alive);
+
         this.frame++;
 
         const battleState = {
@@ -98,21 +117,11 @@ module.exports = class BattleManager {
         };
 
         this.broadcast('battleUpdate', { battleState });
-    }
 
-    broadcast(type, payload) {
-        for (const username of Object.keys(this.players)) {
-            const player = this.players[username];
-            if (!player.exited && player.socket) {
-                player.socket.send(JSON.stringify({
-                    type,
-                    payload,
-                }), error => {
-                    if (error) {
-                        player.exited = true;
-                    }
-                });
-            }
+        if (redLost || blueLost) {
+            this.broadcast('ended', { winner: redLost ? 1 : 0 });
+            this.stopSimulation();
+            return;
         }
     }
 
@@ -122,7 +131,31 @@ module.exports = class BattleManager {
     }
 
     stopSimulation() {
+        this.reload();
+        for (const username of Object.keys(this.players)) {
+            this.players[username].ended = true;
+        }
         clearInterval(this.gameRuntime);
+    }
+
+    sendMessage(player, type, payload = {}) {
+        player.socket.send(JSON.stringify({
+            type,
+            payload,
+        }), error => {
+            if (error) {
+                player.exited = true;
+            }
+        });
+    }
+
+    broadcast(type, payload) {
+        for (const username of Object.keys(this.players)) {
+            const player = this.players[username];
+            if (!player.exited && player.socket) {
+                this.sendMessage(player, type, payload);
+            }
+        }
     }
 
     loadSoldiers(playerIdx, soldierSpecs) {
