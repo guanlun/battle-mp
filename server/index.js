@@ -54,6 +54,7 @@ ws.on('connection', (socket, req) => {
         const data = JSON.parse(dataStr);
 
         const clientIP = req.connection.remoteAddress;
+        console.log(clientIP)
 
         const { gameId, username } = data.payload;
 

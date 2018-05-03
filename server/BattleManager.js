@@ -34,6 +34,11 @@ module.exports = class BattleManager {
     }
 
     addPlayer(username, socket) {
+        if (this.players[username]) {
+            // already in game
+            return;
+        }
+
         const player = this.players[username] = {
             socket,
             soldiers: [],
@@ -79,9 +84,21 @@ module.exports = class BattleManager {
         if (DEV_SP) { // single player dev mode
             // dummy soldiers for the dev opponent
             this.loadSoldiers(0, [
-                // { x: 50, y: 100, type: 'sword' },
+                { x: 50, y: 100, type: 'sword' },
                 { x: 50, y: 200, type: 'sword' },
-                // { x: 50, y: 300, type: 'sword' },
+                { x: 50, y: 300, type: 'sword' },
+                { x: 150, y: 100, type: 'sword' },
+                { x: 150, y: 200, type: 'sword' },
+                { x: 150, y: 300, type: 'sword' },
+                { x: 250, y: 100, type: 'sword' },
+                { x: 250, y: 200, type: 'sword' },
+                { x: 250, y: 300, type: 'sword' },
+                { x: 350, y: 100, type: 'sword' },
+                { x: 350, y: 200, type: 'sword' },
+                { x: 350, y: 300, type: 'sword' },
+                { x: 450, y: 100, type: 'sword' },
+                { x: 450, y: 200, type: 'sword' },
+                { x: 450, y: 300, type: 'sword' },
             ]);
 
             this.startSimulation();
