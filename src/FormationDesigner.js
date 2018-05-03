@@ -25,13 +25,25 @@ const SOLDIER_PRICE = {
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 600;
 
+const SPACING = 20;
+
+const MAX_MONEY = 3000;
+
 export default class FormationDesigner extends React.Component {
     constructor() {
         super();
         this.soldiers = [];
+        this.bufferedSoldiers = [];
+
+        this.dragging = false;
+        this.dragStartPos = {
+            x: 0,
+            y: 0,
+        };
 
         this.state = {
-            remainingMoney: 3000,
+            remainingMoney: MAX_MONEY,
+            bufferedSoldiersPrice: 0,
             activeSoldierType: 'sword',
             savedFormations: [],
         };
@@ -61,13 +73,13 @@ export default class FormationDesigner extends React.Component {
                 savedFormations,
             })
 
-            this.renderCurrentFormation();
+            this.udpateFormation();
         }
     }
 
     render() {
         const { playerIdx } = this.props;
-        const { activeSoldierType, remainingMoney, savedFormations } = this.state;
+        const { activeSoldierType, remainingMoney, bufferedSoldiersPrice, savedFormations } = this.state;
 
         const leftSection = (playerIdx === 0) ? this.createDesignerSection() : this.createOpponentSection();
         const rightSection = (playerIdx === 1) ? this.createDesignerSection() : this.createOpponentSection();
@@ -76,7 +88,7 @@ export default class FormationDesigner extends React.Component {
             <div className="formation-designer">
                 <div>
                     <button onClick={this.handleCompleteFormationButtonClick.bind(this)}>Complete Formation</button>
-                    <div>Remaining money: {remainingMoney}</div>
+                    <div>Remaining money: {remainingMoney - bufferedSoldiersPrice}</div>
                 </div>
                 <div className="soldier-selector">
                     {SOLDIER_TYPES.map(st => (
@@ -89,6 +101,7 @@ export default class FormationDesigner extends React.Component {
                     ))}
                 </div>
                 <div className="designer-adv-control">
+                    <button onClick={this.handleClearButtonClick.bind(this)}>Clear</button>
                     <button onClick={this.handleSaveFormationButtonClick.bind(this)}>Save Formation</button>
                     <div className="designer-load-formation">
                         <div>Load Formation</div>
@@ -121,7 +134,9 @@ export default class FormationDesigner extends React.Component {
                     className="designer-canvas"
                     width={CANVAS_WIDTH}
                     height={CANVAS_HEIGHT}
-                    onClick={this.handleCanvasClick.bind(this)} />
+                    onMouseDown={this.handleCanvasMouseDown.bind(this)}
+                    onMouseMove={this.handleCanvasMouseMove.bind(this)}
+                    onMouseUp={this.handleCanvasMouseUp.bind(this)} />
             </div>
         );
     }
@@ -134,45 +149,112 @@ export default class FormationDesigner extends React.Component {
         );
     }
 
-    renderCurrentFormation() {
+    udpateFormation(renderBuffered = false) {
+        let totalPrice = 0;
+
         this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         for (const s of this.soldiers) {
             renderSoidierAdpter(this.ctx, s, this.props.playerIdx === 0 ? 'red' : 'blue');
+
+            totalPrice += SOLDIER_PRICE[s.type];
         }
+
+        let bufferedSoldiersPrice = 0;
+
+        if (renderBuffered) {
+            for (const s of this.bufferedSoldiers) {
+                renderSoidierAdpter(this.ctx, s, this.props.playerIdx === 0 ? 'red' : 'blue');
+
+                bufferedSoldiersPrice += SOLDIER_PRICE[s.type];
+            }
+        }
+
+        this.setState({
+            remainingMoney: MAX_MONEY - totalPrice,
+            bufferedSoldiersPrice,
+        });
     }
 
     handleCompleteFormationButtonClick() {
         this.props.onFormationComplete(this.soldiers);
     }
 
-    handleCanvasClick(evt) {
-        const { remainingMoney, activeSoldierType} = this.state;
-        const price = SOLDIER_PRICE[activeSoldierType];
+    handleCanvasMouseDown(event) {
+        const x = event.nativeEvent.offsetX;
+        const y = event.nativeEvent.offsetY;
 
-        if (remainingMoney >= price) {
-            const x = evt.nativeEvent.offsetX;
-            const y = evt.nativeEvent.offsetY;
+        this.dragStartPos = { x, y };
+        this.dragging = true;
 
-            const side = this.props.playerIdx === 0 ? 'red' : 'blue';
-
-            const soldier = {
+        if (this.state.remainingMoney - SOLDIER_PRICE[this.state.activeSoldierType] >= 0) {
+            this.bufferedSoldiers = [{
                 x,
                 y,
-                type: activeSoldierType,
-            };
-
-            renderSoidierAdpter(this.ctx, soldier, side);
-
-            this.soldiers.push(soldier);
-
-            this.setState({
-                remainingMoney: remainingMoney - price,
-            });
+                type: this.state.activeSoldierType,
+            }];
         }
+
+        this.udpateFormation(true);
+    }
+
+    handleCanvasMouseMove(event) {
+        if (!this.dragging) {
+            return;
+        }
+
+        const xEnd = event.nativeEvent.offsetX;
+        const yEnd = event.nativeEvent.offsetY;
+
+        const xDiff = xEnd - this.dragStartPos.x;
+        const yDiff = yEnd - this.dragStartPos.y;
+
+        if (Math.abs(xDiff) + Math.abs(yDiff) < 3) {
+            return;
+        }
+
+        const dragSlope = Math.atan2(xDiff, yDiff);
+        const xStep = SPACING * Math.sin(dragSlope);
+        const yStep = SPACING * Math.cos(dragSlope);
+
+        const numSoldiers = Math.floor(xDiff / xStep);
+
+        const soldierType = this.state.activeSoldierType;
+
+        this.bufferedSoldiers = [];
+
+        for (let soldierIdx = 0; soldierIdx < numSoldiers; soldierIdx++) {
+            if (this.state.remainingMoney - (soldierIdx + 1) * SOLDIER_PRICE[soldierType] >= 0) {
+                this.bufferedSoldiers.push({
+                    x: this.dragStartPos.x + soldierIdx * xStep,
+                    y: this.dragStartPos.y + soldierIdx * yStep,
+                    type: soldierType,
+                });
+            }
+        }
+
+        this.udpateFormation(true);
+    }
+
+    handleCanvasMouseUp(event) {
+        const x = event.nativeEvent.offsetX;
+        const y = event.nativeEvent.offsetY;
+
+        this.dragging = false;
+
+        this.soldiers = this.soldiers.concat(this.bufferedSoldiers);
+
+        this.bufferedSoldiers = [];
+
+        this.udpateFormation();
     }
 
     handleSoldierTypeSelect(activeSoldierType) {
         this.setState({ activeSoldierType });
+    }
+
+    handleClearButtonClick() {
+        this.soldiers = [];
+        this.udpateFormation();
     }
 
     handleSaveFormationButtonClick() {
@@ -189,7 +271,7 @@ export default class FormationDesigner extends React.Component {
 
     handleLoadFormationClick(formation) {
         this.soldiers = formation;
-        this.renderCurrentFormation();
+        this.udpateFormation();
     }
 
     loadSavedFormations() {
