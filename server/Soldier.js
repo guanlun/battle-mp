@@ -156,21 +156,7 @@ module.exports = class Soldier {
                     this.velocity.y *= this.maxMovingSpeed;
                 }
 
-                friendly.soldiers.forEach(f => {
-                    if (f === this || !f.alive) {
-                        return;
-                    }
-
-                    const xDiff = f.position.x - this.position.x;
-                    const yDiff = f.position.y - this.position.y;
-
-                    const dist = Utils.distance(this.position, f.position);
-
-                    if (dist < 10) {
-                        this.velocity.x -= 0.5 / dist * xDiff;
-                        this.velocity.y -= 0.5 / dist * yDiff;
-                    }
-                });
+                this.applyPeerRepulsiveForce(friendly);
 
                 if (!isDefending) {
                     this.position.x += this.velocity.x;
@@ -188,8 +174,13 @@ module.exports = class Soldier {
                 this.state = 'moving';
             }
 
-            this.position.x -= this.facing.x * 0.5;
-            this.position.y -= this.facing.y * 0.5;
+            this.velocity.x = -this.facing.x * 0.4;
+            this.velocity.y = -this.facing.y * 0.4;
+
+            this.applyPeerRepulsiveForce(friendly);
+
+            this.position.x += this.velocity.x;
+            this.position.y += this.velocity.y;
         }
 
         if (this.attackCooldown === 0) {
@@ -197,6 +188,24 @@ module.exports = class Soldier {
 
             this.weapon.simulate(this, target, facing);
         }
+    }
+
+    applyPeerRepulsiveForce(friendly) {
+        friendly.soldiers.forEach(f => {
+            if (f === this || !f.alive) {
+                return;
+            }
+
+            const xDiff = f.position.x - this.position.x;
+            const yDiff = f.position.y - this.position.y;
+
+            const dist = Utils.distance(this.position, f.position);
+
+            if (dist < 10) {
+                this.velocity.x -= 0.5 / dist * xDiff;
+                this.velocity.y -= 0.5 / dist * yDiff;
+            }
+        });
     }
 
     attackCompleted() {

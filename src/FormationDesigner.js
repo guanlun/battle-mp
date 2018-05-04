@@ -17,9 +17,9 @@ const KEY_CODE_SOLDIER_TYPE_MAPPING = {
 
 const SOLDIER_PRICE = {
     sword: 50,
-    spear: 80,
+    spear: 90,
     shield: 70,
-    horse: 150,
+    horse: 200,
 }
 
 const CANVAS_WIDTH = 600;

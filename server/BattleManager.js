@@ -117,23 +117,35 @@ module.exports = class BattleManager {
 
         if (DEV_SP) { // single player dev mode
             // dummy soldiers for the dev opponent
-            this.loadSoldiers(0, [
-                { x: 50, y: 100, type: 'sword' },
-                { x: 50, y: 200, type: 'sword' },
-                { x: 50, y: 300, type: 'sword' },
-                { x: 150, y: 100, type: 'sword' },
-                { x: 150, y: 200, type: 'sword' },
-                { x: 150, y: 300, type: 'sword' },
-                { x: 250, y: 100, type: 'sword' },
-                { x: 250, y: 200, type: 'sword' },
-                { x: 250, y: 300, type: 'sword' },
-                { x: 350, y: 100, type: 'sword' },
-                { x: 350, y: 200, type: 'sword' },
-                { x: 350, y: 300, type: 'sword' },
-                { x: 450, y: 100, type: 'sword' },
-                { x: 450, y: 200, type: 'sword' },
-                { x: 450, y: 300, type: 'sword' },
-            ]);
+
+            const soldiers = [];
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 10; j++) {
+                    soldiers.push({
+                        x: 300 + i * 20,
+                        y: j * 30,
+                        type: 'sword',
+                    });
+                }
+            }
+            this.loadSoldiers(0, soldiers);
+            // this.loadSoldiers(0, [
+            //     { x: 50, y: 100, type: 'sword' },
+            //     { x: 50, y: 200, type: 'sword' },
+            //     { x: 50, y: 300, type: 'sword' },
+            //     { x: 150, y: 100, type: 'sword' },
+            //     { x: 150, y: 200, type: 'sword' },
+            //     { x: 150, y: 300, type: 'sword' },
+            //     { x: 250, y: 100, type: 'sword' },
+            //     { x: 250, y: 200, type: 'sword' },
+            //     { x: 250, y: 300, type: 'sword' },
+            //     { x: 350, y: 100, type: 'sword' },
+            //     { x: 350, y: 200, type: 'sword' },
+            //     { x: 350, y: 300, type: 'sword' },
+            //     { x: 450, y: 100, type: 'sword' },
+            //     { x: 450, y: 200, type: 'sword' },
+            //     { x: 450, y: 300, type: 'sword' },
+            // ]);
 
             this.startSimulation();
         } else {
