@@ -2,7 +2,7 @@ import React from 'react';
 
 import FormationDesigner from './FormationDesigner';
 import { SERVER_HOST } from './Constants';
-import { renderSoldier } from './SoldierRenderer';
+import { renderSoldier, renderProjectile } from './SoldierRenderer';
 
 const CANVAS_WIDTH = 1250;
 const CANVAS_HEIGHT = 600;
@@ -101,6 +101,10 @@ export default class MainGame extends React.Component {
         for (const bs of battleState.blue) {
             renderSoldier(this.ctx, bs, 'blue');
         }
+
+        for (const projectile of battleState.projectiles) {
+            renderProjectile(this.ctx, projectile);
+        }
     }
 
     handleJoinButtonClick() {
@@ -186,7 +190,6 @@ export default class MainGame extends React.Component {
                 break;
             case 'battleUpdate':
                 const battleState = msg.payload.battleState;
-
                 this.updateBattleState(battleState);
                 break;
             case 'ended':

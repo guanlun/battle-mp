@@ -27,9 +27,17 @@ const WEAPON_SPEC = {
             y: -5,
         },
     },
+    bow: {
+        type: 'bow',
+        currAttackFrame: 0,
+        drawPosOffset: 0,
+        startPos: {
+            x: 2,
+            y: -5,
+        },
+    },
     horse: {
         type: 'horse',
-
     },
 }
 

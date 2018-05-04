@@ -2,8 +2,8 @@ const Army = require('./Army');
 const Soldier = require('./Soldier');
 const Horseman = require('./Horseman');
 
-const DEV_SP = true;
-// const DEV_SP = false;
+// const DEV_SP = true;
+const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {
@@ -19,6 +19,7 @@ module.exports = class BattleManager {
         this.ongoing = false;
         this.redArmy = new Army('red', this);
         this.blueArmy = new Army('blue', this);
+        this.projectiles = [];
         this.obstacles = [];
         this.frame = 0;
     }
@@ -126,7 +127,7 @@ module.exports = class BattleManager {
                 for (let j = 0; j < 10; j++) {
                     soldiers.push({
                         x: 300 + i * 20,
-                        y: j * 30,
+                        y: 200 + j * 30,
                         type: 'sword',
                     });
                 }
@@ -172,6 +173,11 @@ module.exports = class BattleManager {
         this.redArmy.simulate(this.frame, this);
         this.blueArmy.simulate(this.frame, this);
 
+        for (const projectile of this.projectiles) {
+            projectile.simulate(projectile.side === 'red' ? this.blueArmy.soldiers : this.redArmy.soldiers);
+            // TODO: remove defunct arrow
+        }
+
         const redLost = this.redArmy.soldiers.every(s => !s.alive);
         const blueLost = this.blueArmy.soldiers.every(s => !s.alive);
 
@@ -180,6 +186,7 @@ module.exports = class BattleManager {
         const battleState = {
             red: this.redArmy.soldiers.map(s => s.serialize()),
             blue: this.blueArmy.soldiers.map(s => s.serialize()),
+            projectiles: this.projectiles,
         };
 
         this.broadcast('battleUpdate', { battleState });
@@ -236,13 +243,17 @@ module.exports = class BattleManager {
 
         for (const s of soldierSpecs) {
             if (s.type === 'horse') {
-                army.addSoldier(new Horseman(s.x + xOffset, s.y));
+                army.addSoldier(new Horseman(s.x + xOffset, s.y, this));
             } else {
-                army.addSoldier(new Soldier(s.x + xOffset, s.y, s.type));
+                army.addSoldier(new Soldier(s.x + xOffset, s.y, s.type, this));
             }
         }
 
         army.loaded = true;
+    }
+
+    addProjectile(projectile) {
+        this.projectiles.push(projectile);
     }
 
     isArmyLoaded(playerIdx) {

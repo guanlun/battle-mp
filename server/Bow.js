@@ -1,9 +1,11 @@
 const Utils = require('./Utils');
-
+const Arrow = require('./Arrow');
 const Constants = require('./Constants');
 
 module.exports = class Bow {
-    constructor() {
+    constructor(holder) {
+        this.holder = holder;
+
         this.length = 400;
         this.minRange = 0;
 
@@ -17,6 +19,8 @@ module.exports = class Bow {
             x: 2,
             y: -5,
         };
+
+        this.drawPosOffset = 0;
 
         this.offsetPos = 20;
 
@@ -33,36 +37,49 @@ module.exports = class Bow {
             x: 0,
             y: 0,
         }
+
+        this.attackOngoing = false;
     }
 
     simulate(holder, target, facing) {
-        if (this.status === 'out') {
+        if (this.status === 'drawing') {
             if (this.currAttackFrame === 0) {
-                this.arrowVel = {
-                    x: Math.cos(facing) * 5,
-                    y: Math.sin(facing) * 5,
-                };
+                this.holder.addProjectile(this.arrow);
+            } else if (this.currAttackFrame === 10) {
+                this.status = 'loosing';
+            }
 
-                this.offsetPos = {
-                    x: 0,
-                    y: 0,
-                };
+            if (this.currAttackFrame < 6) {
+                this.drawPosOffset += 6 / 6;
+            }
+
+            this.currAttackFrame++;
+        } else if (this.status === 'loosing') {
+            if (this.currAttackFrame === 11) {
+                this.arrow.shoot(facing);
+
+                this.arrow = null;
+            }
+
+            if (this.currAttackFrame < 13) {
+                this.drawPosOffset -= 6 / 3;
             }
 
             this.currAttackFrame++;
 
             if (this.currAttackFrame === 50) {
+                this.status = 'holding';
                 this.currAttackFrame = 0;
+                this.drawPosOffset = 0;
             }
-
-            this.arrowPos.x += this.arrowVel.x;
-            this.arrowPos.y += this.arrowVel.y;
         }
     }
 
     attack() {
         if (this.status === 'holding') {
-            this.status = 'out';
+            this.arrow = new Arrow(this.holder.position, this.holder.facing, this.holder.army.side);
+
+            this.status = 'drawing';
         }
     }
 
@@ -84,22 +101,12 @@ module.exports = class Bow {
         return 0;
     }
 
-
-    render(ctx) {
-        ctx.save();
-        ctx.translate(this.arrowPos.x, this.arrowPos.y);
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, 20);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
-
-        ctx.beginPath();
-        ctx.moveTo(this.startPos.x, this.startPos.y);
-        ctx.lineTo(this.startPos.x - 10, this.startPos.y - 10);
-        ctx.quadraticCurveTo(this.startPos.x, this.startPos.y - 15, this.startPos.x + 10, this.startPos.y - 10);
-        ctx.closePath();
-        ctx.stroke();
+    serialize() {
+        return {
+            type: this.type,
+            startPos: this.startPos,
+            currAttackFrame: this.currAttackFrame,
+            drawPosOffset: this.drawPosOffset,
+        }
     }
 }

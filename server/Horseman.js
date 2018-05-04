@@ -5,8 +5,8 @@ const OVERCHARGE_FRAME = 60;
 const COOLDOWN_FRAME = 20;
 
 module.exports = class Horseman extends Soldier {
-    constructor(x, y) {
-        super(x, y, 'sword');
+    constructor(x, y, battleManager) {
+        super(x, y, 'sword', battleManager);
 
         this.maxMovingSpeed = 3;
 

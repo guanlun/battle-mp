@@ -13,7 +13,7 @@ const SOLDIER_RENDER_RADIUS = 5;
 const CHANGE_TARGET_REACTION_FRAME = 5;
 
 module.exports = class Soldier {
-    constructor(x, y, weaponType) {
+    constructor(x, y, weaponType, battleManager) {
         this.attackInterval = 60;
         this.speedLimit = 1;
         this.dimension = 5;
@@ -21,9 +21,11 @@ module.exports = class Soldier {
         this.hp = 100;
 
         this.position = {
-            x: x,
-            y: y,
+            x,
+            y,
         };
+
+        this.battleManager = battleManager;
 
         this.velocity = {
             x: 0,
@@ -46,20 +48,20 @@ module.exports = class Soldier {
 
         switch (weaponType) {
             case 'sword':
-                this.weapon = new Sword();
+                this.weapon = new Sword(this);
                 this.maxMovingSpeed = 0.6;
                 break;
             case 'spear':
-                this.weapon = new Spear();
+                this.weapon = new Spear(this);
                 this.maxMovingSpeed = 0.4;
                 break;
             case 'shield':
-                this.weapon = new Shield();
+                this.weapon = new Shield(this);
                 this.maxMovingSpeed = 0.4;
                 break;
             case 'bow':
-                this.weapon = new Bow();
-                this.maxMovingSpeed = 0.7;
+                this.weapon = new Bow(this);
+                this.maxMovingSpeed = 0.5;
                 break;
         }
     }
@@ -238,6 +240,10 @@ module.exports = class Soldier {
     handleAttack(attackWeapon, angle) {
         const damage = this.weapon.defend(attackWeapon, angle);
 
+        this.takeDamage(damage);
+    }
+
+    takeDamage(damage) {
         if (damage > 0) {
             this.hp -= damage;
 
@@ -252,6 +258,10 @@ module.exports = class Soldier {
 
     attack(target, frame) {
         this.weapon.attack();
+    }
+
+    addProjectile(projectile) {
+        this.battleManager.addProjectile(projectile);
     }
 
     renderAlive(ctx) {

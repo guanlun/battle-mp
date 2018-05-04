@@ -33,6 +33,23 @@ export function renderSoldier(ctx, soldier, color) {
     ctx.restore();
 }
 
+export function renderProjectile(ctx, projectile) {
+    if (projectile.defunct) {
+        return;
+    }
+    ctx.save();
+    ctx.strokeStyle = projectile.side;
+
+    ctx.translate(projectile.position.x, projectile.position.y);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(projectile.facing.x * projectile.length, projectile.facing.y * projectile.length);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+}
+
 function renderHorseman(ctx, horseman) {
     ctx.beginPath();
 
@@ -62,6 +79,9 @@ function renderWeapon(ctx, weapon) {
             break;
         case 'shield':
             renderShield(ctx, weapon);
+            break;
+        case 'bow':
+            renderBow(ctx, weapon);
             break;
     }
 }
@@ -108,4 +128,13 @@ function renderShield(ctx, weaponSpec) {
     ctx.stroke();
 
     ctx.restore();
+}
+
+function renderBow(ctx, weaponSpec) {
+    ctx.beginPath();
+    ctx.moveTo(weaponSpec.startPos.x, weaponSpec.startPos.y + weaponSpec.drawPosOffset);
+    ctx.lineTo(weaponSpec.startPos.x - 10, weaponSpec.startPos.y - 10);
+    ctx.quadraticCurveTo(weaponSpec.startPos.x, weaponSpec.startPos.y - 15, weaponSpec.startPos.x + 10, weaponSpec.startPos.y - 10);
+    ctx.closePath();
+    ctx.stroke();
 }

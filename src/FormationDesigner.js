@@ -3,8 +3,9 @@ import { renderSoidierAdpter } from './DesignerRenderAdapter';
 
 const SOLDIER_TYPES = [
     { weapon: 'sword', displayText: 'Swordsman' },
-    { weapon: 'spear', displayText: 'Spear' },
-    { weapon: 'shield', displayText: 'Shield' },
+    { weapon: 'spear', displayText: 'Spearman' },
+    { weapon: 'shield', displayText: 'Shieldman' },
+    { weapon: 'bow', displayText: 'Archer' },
     { weapon: 'horse', displayText: 'Horseman' },
 ];
 
@@ -12,13 +13,15 @@ const KEY_CODE_SOLDIER_TYPE_MAPPING = {
     49: 'sword',
     50: 'spear',
     51: 'shield',
-    52: 'horse',
+    52: 'bow',
+    53: 'horse',
 };
 
 const SOLDIER_PRICE = {
     sword: 50,
     spear: 90,
     shield: 70,
+    bow: 80,
     horse: 200,
 }
 
