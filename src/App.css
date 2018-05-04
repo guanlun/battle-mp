@@ -1,19 +1,92 @@
-body {
-    padding: 10px;
+html, body, #root, .App, .main-game-container, .game-status-item, .game-menu-container {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+
+button {
+    border: 1px solid #4cae4c;
+    outline: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px 30px;
+    min-width: 200px;
+    color: white;
+    background: #5cb85c;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+    background: #6cc86c;
+}
+
+button.btn-secondary {
+    background: white;
+    color: #007bff;
+    border-color: #007bff;
+}
+
+button.btn-secondary:hover {
+    background: #108bff;
+    color: white;
+}
+
+input {
+    border: 1px solid #4cae4c;
+    font-size: 18px;
+    padding: 5px 10px;
+    outline: none;
+    border-radius: 4px;
+    min-width: 200px;
+}
+
+.dropdown-anchor {
+    text-align: center;
+    border: 1px solid #f49b42;
+    color: #f49b42;
+    padding: 5px 10px;
+    border-radius: 4px;
+    min-width: 200px;
+}
+
+.game-menu-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: beige;
 }
 
 .game-menu {
-
+    width: 400px;
+    text-align: center;
+    background: white;
+    padding: 20px 20px 40px 20px;
+    border-radius: 16px;
+    box-shadow: 0 0 4px #ccc;
 }
 
-.game-type-menu {
-
+.game-menu-field {
+    margin-top: 12px;
 }
 
 .formation-designer {
+    padding: 10px;
+}
+
+.designer-control-row {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+.designer-control-element {
+    margin-right: 10px;
 }
 
 .design-sections-container {
+    margin-top: 20px;
 }
 
 .designer-section {
@@ -37,30 +110,36 @@ body {
 
 }
 
+.designer-adv-control {
+    display: flex;
+}
+
 .designer-load-formation {
 
 }
 
 .saved-formation-list {
     display: none;
+    position: absolute;
+    background: white;
+    box-shadow: 0 0 4px #f49b42;
+    cursor: pointer;
 }
 
 .designer-load-formation:hover .saved-formation-list {
     display: block;
-    position: absolute;
-    background: white;
-    box-shadow: 0 0 4px #999;
-    cursor: pointer;
 }
 
 .saved-formation-item {
     display: flex;
     justify-content: space-between;
     padding: 5px 20px;
+    color: #f49b42;
 }
 
 .saved-formation-item:hover {
-    background: beige;
+    background: #f49b42;
+    color: white;
 }
 
 .formation-delete-btn {
@@ -80,10 +159,11 @@ body {
 }
 
 .soldier-selector {
-    margin-top: 10px;
     display: inline-block;
     box-sizing: border-box;
-    border: 1px solid #999;
+    border: 1px solid #4cae4c;
+    color: #4cae4c;
+    border-radius: 4px;
 }
 
 .soldier-selector-option {
@@ -92,15 +172,19 @@ body {
     box-sizing: border-box;
     border-left: 1px solid #999;
     cursor: pointer;
+    min-width: 160px;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
 }
 
 .soldier-selector-option.active {
-    background: #999;
+    background: #5cb85c;
     color: white;
 }
 
 .soldier-selector-option:hover {
-    background: #ccc;
+    background: #6cc86c;
+    color: white;
 }
 
 .soldier-selector-option:first-child {

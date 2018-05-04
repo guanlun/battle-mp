@@ -84,13 +84,23 @@ export default class FormationDesigner extends React.Component {
         const leftSection = (playerIdx === 0) ? this.createDesignerSection() : this.createOpponentSection();
         const rightSection = (playerIdx === 1) ? this.createDesignerSection() : this.createOpponentSection();
 
+        let remaininngMoneyTextColor = '#5cb85c';
+
+        if (remainingMoney < 0.2 * MAX_MONEY) {
+            remaininngMoneyTextColor = '#ce3333';
+        } else if (remainingMoney < 0.4 * MAX_MONEY) {
+            remaininngMoneyTextColor = '#f4ce42';
+        }
+
         return (
             <div className="formation-designer">
-                <div>
-                    <button onClick={this.handleCompleteFormationButtonClick.bind(this)}>Complete Formation</button>
-                    <div>Remaining money: {remainingMoney - bufferedSoldiersPrice}</div>
+                <div className="designer-control-row">
+                    <button className="designer-control-element" onClick={this.handleCompleteFormationButtonClick.bind(this)}>Complete Formation</button>
+                    <div className="designer-control-element">
+                        Remaining money: <b style={{ color: remaininngMoneyTextColor }}>{remainingMoney - bufferedSoldiersPrice}</b>
+                    </div>
                 </div>
-                <div className="soldier-selector">
+                <div className="designer-control-row soldier-selector">
                     {SOLDIER_TYPES.map(st => (
                         <div
                             key={`soldier-type-${st.weapon}`}
@@ -100,11 +110,11 @@ export default class FormationDesigner extends React.Component {
                         </div>
                     ))}
                 </div>
-                <div className="designer-adv-control">
-                    <button onClick={this.handleClearButtonClick.bind(this)}>Clear</button>
-                    <button onClick={this.handleSaveFormationButtonClick.bind(this)}>Save Formation</button>
-                    <div className="designer-load-formation">
-                        <div>Load Formation</div>
+                <div className="designer-control-row designer-adv-control">
+                    <button className="designer-control-element btn-secondary" onClick={this.handleClearButtonClick.bind(this)}>Clear</button>
+                    <button className="designer-control-element btn-secondary" onClick={this.handleSaveFormationButtonClick.bind(this)}>Save Formation</button>
+                    <div className="designer-control-element designer-load-formation">
+                        <div className="dropdown-anchor">Load Formation</div>
                         <div className="saved-formation-list">
                             {savedFormations.map((formation, idx) => (
                                 <div

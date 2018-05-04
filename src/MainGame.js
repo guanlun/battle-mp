@@ -45,32 +45,45 @@ export default class MainGame extends React.Component {
         const { status, playerIdx, opponentName, battleState } = this.state;
 
         return (
-            <div>
-                <div style={this.displayStyleOfState('none')}>
-                    <input
-                        ref="usernameInput"
-                        type="text"
-                        placeholder="Your name here" />
-                    <button onClick={this.handleJoinButtonClick.bind(this)}>Join</button>
+            <div className="main-game-container">
+                <div className="game-status-item" style={this.displayStyleOfState('none')}>
+                    <div className="game-menu-container">
+                        <div className="game-menu">
+                            <div className="game-menu-field">
+                                <p>Enter your nickname:</p>
+                            </div>
+                            <div className="game-menu-field">
+                                <input
+                                    ref="usernameInput"
+                                    type="text"
+                                    placeholder="Your name here" />
+                            </div>
+                            <div className="game-menu-field">
+                                <button onClick={this.handleJoinButtonClick.bind(this)}>Join</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div style={this.displayStyleOfState('waiting')}>
+                <div className="game-status-item" style={this.displayStyleOfState('waiting')}>
                     Waiting for the other player
                 </div>
-                <div style={this.displayStyleOfState('ready')}>
+                <div className="game-status-item" style={this.displayStyleOfState('ready')}>
                     <FormationDesigner
                         playerIdx={playerIdx}
                         opponentName={opponentName}
                         onFormationComplete={this.handleFormationComplete.bind(this)} />
                 </div>
-                <div style={this.displayStyleOfState('deployed')}>
+                <div className="game-status-item" style={this.displayStyleOfState('deployed')}>
                     Waiting for the enemy to deploy
                 </div>
-                <div style={this.displayStyleOfState('fighting', 'ended')}>
+                <div className="game-status-item" style={this.displayStyleOfState('fighting', 'ended')}>
                     <canvas ref="battleCanvas" width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
                     <div style={this.displayStyleOfState('ended')}>
                         <div className="game-ended-overlay">
-                            Game Ended
-                            <button onClick={this.handleRematchButtonClick.bind(this)}>Rematch</button>
+                            <div className="game-menu">
+                                <h3>Game Ended</h3>
+                                <button onClick={this.handleRematchButtonClick.bind(this)}>Rematch</button>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -9,6 +9,9 @@ const CROSS_SIZE = 5;
 
 const SOLDIER_RENDER_RADIUS = 5;
 
+// TODO: should not change target too frequently
+const CHANGE_TARGET_REACTION_FRAME = 5;
+
 module.exports = class Soldier {
     constructor(x, y, weaponType) {
         this.attackInterval = 60;
@@ -274,23 +277,27 @@ module.exports = class Soldier {
         let target = null;
 
         for (let i = 0; i < enemySoldiers.length; i++) {
-            const es = enemySoldiers[i];
+            const enemySoldier = enemySoldiers[i];
 
-            if (!es.alive) {
+            if (!enemySoldier.alive) {
                 continue;
             }
 
-            const diff = Utils.sub(es.position, this.position);
-            if (Utils.angleBetween(diff, this.facing) < Math.cos(angle)) {
+            const diff = Utils.sub(enemySoldier.position, this.position);
+            const angleFromFacing = Utils.angleBetween(diff, this.facing)
+            if (angleFromFacing < Math.cos(angle)) {
                 continue;
             }
 
-            const dist = this.distTo(es);
+            // Factor in the angle between the facing direction and the enemy direction
+            // Intuitively, enemies directly in front of you looks closer
+            const dist = this.distTo(enemySoldier) * (1 - 0.2 * Math.cos(angleFromFacing));
+            // const dist = this.distTo(enemySoldier);
 
             if (dist < minDist) {
                 minDist = dist;
 
-                target = es;
+                target = enemySoldier;
             }
         }
 
