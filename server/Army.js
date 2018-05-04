@@ -1,9 +1,10 @@
 module.exports = class Army {
-    constructor(side) {
+    constructor(side, battleManager) {
         this.side = side;
         this.soldiers = [];
 
         this.loaded = false;
+        this.battleManager = battleManager;
     }
 
     simulate(frame, state) {
@@ -42,5 +43,12 @@ module.exports = class Army {
 
     clear() {
         this.soldiers = [];
+    }
+
+    getBattleFieldSize() {
+        return {
+            width: this.battleManager.battleFieldWidth,
+            height: this.battleManager.battleFieldHeight,
+        };
     }
 }

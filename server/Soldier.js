@@ -7,6 +7,8 @@ const Bow = require('./Bow');
 
 const CROSS_SIZE = 5;
 
+const SOLDIER_RENDER_RADIUS = 5;
+
 module.exports = class Soldier {
     constructor(x, y, weaponType) {
         this.attackInterval = 60;
@@ -183,6 +185,8 @@ module.exports = class Soldier {
             this.position.y += this.velocity.y;
         }
 
+        this.preventExitingBattlefield();
+
         if (this.attackCooldown === 0) {
             const facing = Math.atan2(this.facing.y, this.facing.x) + Math.PI / 2;
 
@@ -206,6 +210,22 @@ module.exports = class Soldier {
                 this.velocity.y -= 0.5 / dist * yDiff;
             }
         });
+    }
+
+    preventExitingBattlefield() {
+        const battleFieldSize = this.army.getBattleFieldSize();
+
+        if (this.position.x < SOLDIER_RENDER_RADIUS) {
+            this.position.x = SOLDIER_RENDER_RADIUS;
+        } else if (this.position.x > battleFieldSize.width - SOLDIER_RENDER_RADIUS) {
+            this.position.x = battleFieldSize.width - SOLDIER_RENDER_RADIUS;
+        }
+
+        if (this.position.y < SOLDIER_RENDER_RADIUS) {
+            this.position.y = SOLDIER_RENDER_RADIUS;
+        } else if (this.position.y > battleFieldSize.height - SOLDIER_RENDER_RADIUS) {
+            this.position.y = battleFieldSize.height - SOLDIER_RENDER_RADIUS;
+        }
     }
 
     attackCompleted() {

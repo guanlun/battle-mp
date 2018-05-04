@@ -4,6 +4,9 @@ import FormationDesigner from './FormationDesigner';
 import { SERVER_HOST } from './Constants';
 import { renderSoldier } from './SoldierRenderer';
 
+const CANVAS_WIDTH = 1250;
+const CANVAS_HEIGHT = 600;
+
 export default class MainGame extends React.Component {
     constructor() {
         super();
@@ -63,7 +66,7 @@ export default class MainGame extends React.Component {
                     Waiting for the enemy to deploy
                 </div>
                 <div style={this.displayStyleOfState('fighting', 'ended')}>
-                    <canvas ref="battleCanvas" width="1200" height="600" />
+                    <canvas ref="battleCanvas" width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
                     <div style={this.displayStyleOfState('ended')}>
                         <div className="game-ended-overlay">
                             Game Ended
@@ -76,7 +79,7 @@ export default class MainGame extends React.Component {
     }
 
     updateBattleState(battleState) {
-        this.ctx.clearRect(0, 0, 1200, 600);
+        this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         for (const rs of battleState.red) {
             renderSoldier(this.ctx, rs, 'red');

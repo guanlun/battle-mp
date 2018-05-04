@@ -10,12 +10,15 @@ module.exports = class BattleManager {
         this.players = {};
 
         this.reload();
+
+        this.battleFieldWidth = 1250;
+        this.battleFieldHeight = 600;
     }
 
     reload() {
         this.ongoing = false;
-        this.redArmy = new Army('red');
-        this.blueArmy = new Army('blue');
+        this.redArmy = new Army('red', this);
+        this.blueArmy = new Army('blue', this);
         this.obstacles = [];
         this.frame = 0;
     }
