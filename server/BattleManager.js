@@ -2,8 +2,8 @@ const Army = require('./Army');
 const Soldier = require('./Soldier');
 const Horseman = require('./Horseman');
 
-// const DEV_SP = true;
-const DEV_SP = false;
+const DEV_SP = true;
+// const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {
@@ -128,7 +128,7 @@ module.exports = class BattleManager {
                     soldiers.push({
                         x: 300 + i * 20,
                         y: 200 + j * 30,
-                        type: 'sword',
+                        type: 'bow',
                     });
                 }
             }

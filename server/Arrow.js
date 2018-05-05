@@ -32,7 +32,7 @@ module.exports = class Arrow {
         if (this.shot && !this.defunct) {
             for (const s of enemies) {
                 // TODO: improve hit detection
-                if (Utils.distance(this.position, s.position) < 5) {
+                if (s.alive && Utils.distance(this.position, s.position) < 5) {
                     // TODO: add defense mechanism for arrows
                     s.takeDamage(20);
                     this.defunct = true;
@@ -42,9 +42,16 @@ module.exports = class Arrow {
     }
 
     shoot(direction) {
+        const errorAmount = 0.04;
+        const erroredDirection = direction + (Math.random() * errorAmount - errorAmount / 2);
+
         this.velocity = {
-            x: Math.sin(direction) * 12,
-            y: -Math.cos(direction) * 12,
+            x: Math.sin(erroredDirection) * 12,
+            y: -Math.cos(erroredDirection) * 12,
+        };
+        this.facing = {
+            x: Math.sin(erroredDirection),
+            y: -Math.cos(erroredDirection),
         };
         this.shot = true;
     }
