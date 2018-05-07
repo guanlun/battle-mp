@@ -12,8 +12,8 @@ module.exports = class Arrow {
         };
 
         this.position = {
-            x: position.x,
-            y: position.y,
+            x: position.x + facing.x * 5,
+            y: position.y + facing.y * 5,
         };
 
         this.facing = {
@@ -21,8 +21,11 @@ module.exports = class Arrow {
             y: facing.y,
         };
 
-        this.length = 20;
+        this.length = 10;
         this.side = side;
+
+        this.type = 'arrow';
+        this.damage = 20;
     }
 
     simulate(enemies) {
@@ -49,8 +52,8 @@ module.exports = class Arrow {
 
             const distAlongArrowVelocity = Utils.dim(Utils.scalarMult(directionVelocityAngleCos, lastPosToEnemyPos));
             if (distAlongArrowVelocity <= Utils.dim(this.velocity) && distAlongArrowVelocity >= 0) {
-                // TODO: add defense mechanism for arrows
-                enemy.takeDamage(20);
+                const attackAngle = Utils.dot(Utils.normalize(this.velocity), enemy.facing);
+                enemy.handleAttack(this, attackAngle);
                 this.defunct = true;
 
                 break;
@@ -59,7 +62,7 @@ module.exports = class Arrow {
     }
 
     shoot(direction) {
-        const errorAmount = 0.05;
+        const errorAmount = 0.04;
         const erroredDirection = direction + (Math.random() * errorAmount - errorAmount / 2);
 
         this.velocity = {

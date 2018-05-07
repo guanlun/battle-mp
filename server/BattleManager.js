@@ -2,8 +2,8 @@ const Army = require('./Army');
 const Soldier = require('./Soldier');
 const Horseman = require('./Horseman');
 
-const DEV_SP = true;
-// const DEV_SP = false;
+// const DEV_SP = true;
+const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {

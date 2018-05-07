@@ -2,6 +2,12 @@ const Utils = require('./Utils');
 const Arrow = require('./Arrow');
 const Constants = require('./Constants');
 
+const DRAW_DISTANCE = 8;
+const DRAW_TIME = 8;
+const LOOSE_TIME = 4;
+const DRAW_AMOUNT_PER_FRAME = DRAW_DISTANCE / DRAW_TIME;
+const LOOSE_AMOUNT_PER_FRAME = DRAW_DISTANCE / LOOSE_TIME;
+
 module.exports = class Bow {
     constructor(holder) {
         this.holder = holder;
@@ -16,27 +22,14 @@ module.exports = class Bow {
         this.currAttackFrame = 0;
 
         this.startPos = {
-            x: 2,
+            x: 0,
             y: -5,
         };
 
         this.drawPosOffset = 0;
 
-        this.offsetPos = 20;
-
         this.status = 'holding';
-
         this.type = 'bow';
-
-        this.arrowVel = {
-            x: 0,
-            y: 0,
-        };
-
-        this.arrowPos = {
-            x: 0,
-            y: 0,
-        }
 
         this.attackOngoing = false;
     }
@@ -49,8 +42,10 @@ module.exports = class Bow {
                 this.status = 'loosing';
             }
 
-            if (this.currAttackFrame < 6) {
-                this.drawPosOffset += 6 / 6;
+            if (this.currAttackFrame < DRAW_TIME) {
+                this.drawPosOffset += DRAW_AMOUNT_PER_FRAME;
+
+                this.arrow.position = Utils.add(this.arrow.position, Utils.scalarMult(-DRAW_AMOUNT_PER_FRAME, this.arrow.facing));
             }
 
             this.currAttackFrame++;
@@ -61,8 +56,8 @@ module.exports = class Bow {
                 this.arrow = null;
             }
 
-            if (this.currAttackFrame < 13) {
-                this.drawPosOffset -= 6 / 3;
+            if (this.currAttackFrame < 10 + LOOSE_TIME) {
+                this.drawPosOffset -= LOOSE_AMOUNT_PER_FRAME;
             }
 
             this.currAttackFrame++;

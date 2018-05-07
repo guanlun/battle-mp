@@ -15,12 +15,12 @@ module.exports = class Weapon {
 
         const rand = Math.random();
 
-        if (attackAngle < blockChance.angle) {
+        if (attackAngle < blockChance.angle) { // attack is in the blocking angle of the enemy's weapon => can be blocked
             if (rand > blockChance[attackWeapon.type]) {
                 return attackWeapon.damage;
             }
         } else {
-            if (rand > 0.2) {
+            if (rand > 0.2) { // attack out of the blocking angle => 80% chance of dealing damage
                 return attackWeapon.damage;
             }
         }

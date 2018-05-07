@@ -133,8 +133,8 @@ function renderShield(ctx, weaponSpec) {
 function renderBow(ctx, weaponSpec) {
     ctx.beginPath();
     ctx.moveTo(weaponSpec.startPos.x, weaponSpec.startPos.y + weaponSpec.drawPosOffset);
-    ctx.lineTo(weaponSpec.startPos.x - 10, weaponSpec.startPos.y - 10);
-    ctx.quadraticCurveTo(weaponSpec.startPos.x, weaponSpec.startPos.y - 15, weaponSpec.startPos.x + 10, weaponSpec.startPos.y - 10);
+    ctx.lineTo(weaponSpec.startPos.x - 10, weaponSpec.startPos.y + weaponSpec.drawPosOffset / 2);
+    ctx.quadraticCurveTo(weaponSpec.startPos.x, weaponSpec.startPos.y - 6, weaponSpec.startPos.x + 10, weaponSpec.startPos.y + weaponSpec.drawPosOffset / 2);
     ctx.closePath();
     ctx.stroke();
 }

@@ -32,7 +32,7 @@ const WEAPON_SPEC = {
         currAttackFrame: 0,
         drawPosOffset: 0,
         startPos: {
-            x: 2,
+            x: 0,
             y: -5,
         },
     },
