@@ -23,5 +23,8 @@
     "prod-env": "echo 'module.exports = { ENV: \"prod\" };' > ./src/Env.js",
     "deploy-prod": "sudo cp -r ./build/* /var/www/html/battle/",
     "build-prod": "npm run prod-env; npm run build; npm run deploy-prod"
+  },
+  "devDependencies": {
+    "node-inspect": "^1.11.3"
   }
 }

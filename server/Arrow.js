@@ -26,23 +26,40 @@ module.exports = class Arrow {
     }
 
     simulate(enemies) {
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
+        if (!this.shot || this.defunct) {
+            return;
+        }
 
-        if (this.shot && !this.defunct) {
-            for (const s of enemies) {
-                // TODO: improve hit detection
-                if (s.alive && Utils.distance(this.position, s.position) < 5) {
-                    // TODO: add defense mechanism for arrows
-                    s.takeDamage(20);
-                    this.defunct = true;
-                }
+        const lastPos = Utils.copy(this.position);
+        this.position = Utils.add(this.position, this.velocity);
+
+        for (const enemy of enemies) {
+            if (!enemy.alive) {
+                continue;
+            }
+
+            const lastPosToEnemyPos = Utils.sub(enemy.position, lastPos);
+            const directionVelocityAngleCos = Utils.cosAngleBetween(lastPosToEnemyPos, this.velocity);
+            const directionVelocityAngleSin = Math.sqrt(1 - directionVelocityAngleCos * directionVelocityAngleCos)
+            const enemyPositionToArrowPathDist = Utils.dim(Utils.scalarMult(directionVelocityAngleSin, lastPosToEnemyPos));
+
+            if (enemyPositionToArrowPathDist >= 5) {
+                continue;
+            }
+
+            const distAlongArrowVelocity = Utils.dim(Utils.scalarMult(directionVelocityAngleCos, lastPosToEnemyPos));
+            if (distAlongArrowVelocity <= Utils.dim(this.velocity) && distAlongArrowVelocity >= 0) {
+                // TODO: add defense mechanism for arrows
+                enemy.takeDamage(20);
+                this.defunct = true;
+
+                break;
             }
         }
     }
 
     shoot(direction) {
-        const errorAmount = 0.04;
+        const errorAmount = 0.05;
         const erroredDirection = direction + (Math.random() * errorAmount - errorAmount / 2);
 
         this.velocity = {

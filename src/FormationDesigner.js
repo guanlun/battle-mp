@@ -30,7 +30,7 @@ const CANVAS_HEIGHT = 600;
 
 const SPACING = 20;
 
-const MAX_MONEY = 3000;
+const MAX_MONEY = 6000;
 
 export default class FormationDesigner extends React.Component {
     constructor() {

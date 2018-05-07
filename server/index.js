@@ -106,7 +106,6 @@ function createGameId() {
 }
 
 app.post('/createGame', (req, res) => {
-    console.log(req)
     res.send({
         id: createGameId(),
     });

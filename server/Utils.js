@@ -37,7 +37,7 @@ module.exports = class Utils {
         };
     }
 
-    static angleBetween(vec1, vec2) {
+    static cosAngleBetween(vec1, vec2) {
         const dotProduct = Utils.dot(vec1, vec2);
         const dimProduct = Utils.dim(vec1) * Utils.dim(vec2);
 
@@ -52,5 +52,12 @@ module.exports = class Utils {
 
     static isZeroVec(v) {
         return Utils.dim(v) < 0.001;
+    }
+
+    static copy(vec) {
+        return {
+            x: vec.x,
+            y: vec.y,
+        };
     }
 }

@@ -294,7 +294,7 @@ module.exports = class Soldier {
             }
 
             const diff = Utils.sub(enemySoldier.position, this.position);
-            const angleFromFacing = Utils.angleBetween(diff, this.facing)
+            const angleFromFacing = Utils.cosAngleBetween(diff, this.facing)
             if (angleFromFacing < Math.cos(angle)) {
                 continue;
             }
