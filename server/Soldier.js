@@ -49,15 +49,15 @@ module.exports = class Soldier {
         switch (weaponType) {
             case 'sword':
                 this.weapon = new Sword(this);
-                this.maxMovingSpeed = 0.6;
+                this.maxMovingSpeed = 0.8;
                 break;
             case 'spear':
                 this.weapon = new Spear(this);
-                this.maxMovingSpeed = 0.4;
+                this.maxMovingSpeed = 0.5;
                 break;
             case 'shield':
                 this.weapon = new Shield(this);
-                this.maxMovingSpeed = 0.4;
+                this.maxMovingSpeed = 0.5;
                 break;
             case 'bow':
                 this.weapon = new Bow(this);
@@ -257,7 +257,7 @@ module.exports = class Soldier {
     }
 
     attack(target, frame) {
-        this.weapon.attack();
+        this.weapon.attack(target);
     }
 
     addProjectile(projectile) {

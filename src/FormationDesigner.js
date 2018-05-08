@@ -22,7 +22,7 @@ const SOLDIER_PRICE = {
     spear: 90,
     shield: 70,
     bow: 80,
-    horse: 200,
+    horse: 250,
 }
 
 const CANVAS_WIDTH = 600;

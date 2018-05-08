@@ -19,6 +19,9 @@ module.exports = class BattleManager {
         this.ongoing = false;
         this.redArmy = new Army('red', this);
         this.blueArmy = new Army('blue', this);
+
+        // this.blueArmy.defensiveStance = true;
+
         this.projectiles = [];
         this.obstacles = [];
         this.frame = 0;
@@ -123,7 +126,7 @@ module.exports = class BattleManager {
             // dummy soldiers for the dev opponent
 
             const soldiers = [];
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 5; i++) {
                 for (let j = 0; j < 10; j++) {
                     soldiers.push({
                         x: 300 + i * 20,
@@ -174,9 +177,10 @@ module.exports = class BattleManager {
         this.blueArmy.simulate(this.frame, this);
 
         for (const projectile of this.projectiles) {
-            projectile.simulate(projectile.side === 'red' ? this.blueArmy.soldiers : this.redArmy.soldiers);
-            // TODO: remove defunct arrow
+            projectile.simulate([...this.redArmy.soldiers, ...this.blueArmy.soldiers]);
         }
+
+        this.projectiles = this.projectiles.filter(p => !p.defunct);
 
         const redLost = this.redArmy.soldiers.every(s => !s.alive);
         const blueLost = this.blueArmy.soldiers.every(s => !s.alive);
@@ -186,7 +190,7 @@ module.exports = class BattleManager {
         const battleState = {
             red: this.redArmy.soldiers.map(s => s.serialize()),
             blue: this.blueArmy.soldiers.map(s => s.serialize()),
-            projectiles: this.projectiles,
+            projectiles: this.projectiles.map(p => p.serialize()),
         };
 
         this.broadcast('battleUpdate', { battleState });

@@ -5,14 +5,16 @@ module.exports = class Army {
 
         this.loaded = false;
         this.battleManager = battleManager;
+
+        this.defensiveStance = false;
     }
 
     simulate(frame, state) {
         this.soldiers.forEach(s => {
             if (this.side === 'red') {
-                s.simulate(frame, this, state.blueArmy, state.obstacles);
+                s.simulate(frame, this, state.blueArmy, state.obstacles, this.defensiveStance);
             } else {
-                s.simulate(frame, this, state.redArmy, state.obstacles);
+                s.simulate(frame, this, state.redArmy, state.obstacles, this.defensiveStance);
             }
         });
     }

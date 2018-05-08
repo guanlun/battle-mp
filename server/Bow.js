@@ -13,7 +13,7 @@ module.exports = class Bow {
         this.holder = holder;
 
         this.length = 400;
-        this.minRange = 0;
+        this.minRange = 30;
 
         this.damage = 50;
 
@@ -51,7 +51,8 @@ module.exports = class Bow {
             this.currAttackFrame++;
         } else if (this.status === 'loosing') {
             if (this.currAttackFrame === 11) {
-                this.arrow.shoot(facing);
+                const targetDist = Utils.dim(Utils.sub(target.position, holder.position));
+                this.arrow.shoot(facing, targetDist);
 
                 this.arrow = null;
             }
@@ -72,7 +73,7 @@ module.exports = class Bow {
 
     attack() {
         if (this.status === 'holding') {
-            this.arrow = new Arrow(this.holder.position, this.holder.facing, this.holder.army.side);
+            this.arrow = new Arrow(this.holder.position, this.holder.facing, this.holder.army.side, this.holder);
 
             this.status = 'drawing';
         }

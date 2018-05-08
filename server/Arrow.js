@@ -1,8 +1,10 @@
 const Utils = require('./Utils');
 const Constants = require('./Constants');
 
+const ARROW_SPEED = 12;
+
 module.exports = class Arrow {
-    constructor(position, facing, side) {
+    constructor(position, facing, side, shooter) {
         this.shot = false;
         this.defunct = false;
 
@@ -16,19 +18,20 @@ module.exports = class Arrow {
             y: position.y + facing.y * 5,
         };
 
-        this.facing = {
-            x: facing.x,
-            y: facing.y,
-        };
+        this.facing = Utils.copy(facing);
+
+        this.targetDistance = 0;
+        this.flyingDistance = 0;
 
         this.length = 10;
         this.side = side;
 
         this.type = 'arrow';
         this.damage = 20;
+        this.shooter = shooter;
     }
 
-    simulate(enemies) {
+    simulate(soldiers) {
         if (!this.shot || this.defunct) {
             return;
         }
@@ -36,24 +39,32 @@ module.exports = class Arrow {
         const lastPos = Utils.copy(this.position);
         this.position = Utils.add(this.position, this.velocity);
 
-        for (const enemy of enemies) {
-            if (!enemy.alive) {
+        this.flyingDistance += ARROW_SPEED;
+
+        if (this.flyingDistance > this.targetDistance + 20) { // reached max distance
+            this.defunct = true;
+        } else if (this.targetDistance > 100 && this.flyingDistance < this.targetDistance * 0.8) { // still high in the air
+            return;
+        }
+
+        for (const soldier of soldiers) {
+            if (!soldier.alive || soldier === this.shooter) {
                 continue;
             }
 
-            const lastPosToEnemyPos = Utils.sub(enemy.position, lastPos);
-            const directionVelocityAngleCos = Utils.cosAngleBetween(lastPosToEnemyPos, this.velocity);
+            const lastPosTosoldierPos = Utils.sub(soldier.position, lastPos);
+            const directionVelocityAngleCos = Utils.cosAngleBetween(lastPosTosoldierPos, this.velocity);
             const directionVelocityAngleSin = Math.sqrt(1 - directionVelocityAngleCos * directionVelocityAngleCos)
-            const enemyPositionToArrowPathDist = Utils.dim(Utils.scalarMult(directionVelocityAngleSin, lastPosToEnemyPos));
+            const soldierPositionToArrowPathDist = Utils.dim(Utils.scalarMult(directionVelocityAngleSin, lastPosTosoldierPos));
 
-            if (enemyPositionToArrowPathDist >= 5) {
+            if (soldierPositionToArrowPathDist >= 5) {
                 continue;
             }
 
-            const distAlongArrowVelocity = Utils.dim(Utils.scalarMult(directionVelocityAngleCos, lastPosToEnemyPos));
+            const distAlongArrowVelocity = Utils.dim(Utils.scalarMult(directionVelocityAngleCos, lastPosTosoldierPos));
             if (distAlongArrowVelocity <= Utils.dim(this.velocity) && distAlongArrowVelocity >= 0) {
-                const attackAngle = Utils.dot(Utils.normalize(this.velocity), enemy.facing);
-                enemy.handleAttack(this, attackAngle);
+                const attackAngle = Utils.dot(Utils.normalize(this.velocity), soldier.facing);
+                soldier.handleAttack(this, attackAngle);
                 this.defunct = true;
 
                 break;
@@ -61,24 +72,28 @@ module.exports = class Arrow {
         }
     }
 
-    shoot(direction) {
+    shoot(direction, targetDistance) {
         const errorAmount = 0.04;
         const erroredDirection = direction + (Math.random() * errorAmount - errorAmount / 2);
 
         this.velocity = {
-            x: Math.sin(erroredDirection) * 12,
-            y: -Math.cos(erroredDirection) * 12,
+            x: Math.sin(erroredDirection) * ARROW_SPEED,
+            y: -Math.cos(erroredDirection) * ARROW_SPEED,
         };
         this.facing = {
             x: Math.sin(erroredDirection),
             y: -Math.cos(erroredDirection),
         };
         this.shot = true;
+
+        this.targetDistance = targetDistance;
+        this.flyingDistance = 0;
     }
 
     serialize() {
         return {
             type: this.type,
+            position: this.position,
             startPos: this.startPos,
             facing: this.facing,
             length: this.length,
