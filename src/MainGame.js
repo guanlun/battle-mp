@@ -41,12 +41,18 @@ export default class MainGame extends React.Component {
         };
     }
 
+    opacityStyleOfState(...status) {
+        return {
+            opacity: (status.indexOf(this.state.status) !== -1) ? 1 : 0,
+        };
+    }
+
     render() {
         const { status, playerIdx, opponentName, battleState } = this.state;
 
         return (
             <div className="main-game-container">
-                <div className="game-status-item" style={this.displayStyleOfState('none')}>
+                <div className="game-status-item" style={this.displayStyleOfState('none', 'waiting')}>
                     <div className="game-menu-container">
                         <div className="game-menu">
                             <div className="game-menu-field">
@@ -59,13 +65,17 @@ export default class MainGame extends React.Component {
                                     placeholder="Your name here" />
                             </div>
                             <div className="game-menu-field">
-                                <button onClick={this.handleJoinButtonClick.bind(this)}>Join</button>
+                                <button
+                                    disabled={status === 'waiting'}
+                                    onClick={this.handleJoinButtonClick.bind(this)}>
+                                    Join
+                                </button>
+                            </div>
+                            <div className="game-menu-field game-status-item" style={this.opacityStyleOfState('waiting')}>
+                                Waiting for the other player to join
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="game-status-item" style={this.displayStyleOfState('waiting')}>
-                    Waiting for the other player
                 </div>
                 <div className="game-status-item" style={this.displayStyleOfState('ready')}>
                     <FormationDesigner

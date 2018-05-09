@@ -1,6 +1,8 @@
 const Army = require('./Army');
 const Soldier = require('./Soldier');
 const Horseman = require('./Horseman');
+const Map = require('./map');
+// const Obstacle = require('./Obstacle');
 
 // const DEV_SP = true;
 const DEV_SP = false;
@@ -13,6 +15,8 @@ module.exports = class BattleManager {
 
         this.battleFieldWidth = 1250;
         this.battleFieldHeight = 600;
+
+        this.map = new Map();
     }
 
     reload() {
@@ -63,7 +67,11 @@ module.exports = class BattleManager {
                 if (this.ongoing) {
                     this.sendMessage(player, 'rejoin', { playerIdx: player.playerIdx, opponentName: opponent.username });
                 } else {
-                    this.sendMessage(player, 'ready', { playerIdx: player.playerIdx, opponentName: opponent.username });
+                    if (opponent) {
+                        this.sendMessage(player, 'ready', { playerIdx: player.playerIdx, opponentName: opponent.username });
+                    } else {
+                        this.sendMessage(player, 'joined');
+                    }
                 }
             } else {
                 socket.send(JSON.stringify({ type: 'duplicatedPlayer' }));
@@ -131,7 +139,7 @@ module.exports = class BattleManager {
                     soldiers.push({
                         x: 300 + i * 20,
                         y: 200 + j * 30,
-                        type: 'bow',
+                        type: 'sword',
                     });
                 }
             }
@@ -217,8 +225,13 @@ module.exports = class BattleManager {
     }
 
     sendMessage(player, type, payload = {}) {
+        if (!player) {
+            console.log(`Player not joined`);
+            return;
+        }
+
         if (!player.socket) {
-            console.log(`Player ${player.username}'s socket is undefined`)
+            console.log(`Player ${player.username}'s socket is undefined`);
             return;
         }
 

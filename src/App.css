@@ -21,6 +21,12 @@ button:hover {
     background: #6cc86c;
 }
 
+button:disabled {
+    background: #ccc;
+    border: 1px solid #999;
+    cursor: default;
+}
+
 button.btn-secondary {
     background: white;
     color: #007bff;
