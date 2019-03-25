@@ -1,10 +1,17 @@
-module.exports = class Army {
-    constructor(side, battleManager) {
+import Soldier from './Soldier';
+import Horseman from './Horseman';
+
+export default class Army {
+    constructor(side, soldierSpecs, battleSimulator) {
         this.side = side;
         this.soldiers = [];
 
         this.loaded = false;
-        this.battleManager = battleManager;
+        this.battleSimulator = battleSimulator;
+
+        for (const soldierSpec of soldierSpecs) {
+            this.addSoldier(soldierSpec, side === 'red' ? 0 : 650);
+        }
 
         this.defensiveStance = false;
     }
@@ -26,21 +33,16 @@ module.exports = class Army {
         });
     }
 
-    addSoldier(s) {
-        s.army = this;
+    addSoldier(s, xOffset) {
+        let soldier;
 
-        if (this.side === 'red') {
-            s.facing = {
-                x: 1,
-                y: 0,
-            };
+        if (s.type === 'horse') {
+            soldier = new Horseman(s.x + xOffset, s.y, this, this.battleSimulator);
         } else {
-            s.facing = {
-                x: -1,
-                y: 0,
-            };
+            soldier = new Soldier(s.x + xOffset, s.y, this, s.type, this.battleSimulator);
         }
-        this.soldiers.push(s);
+
+        this.soldiers.push(soldier);
     }
 
     clear() {
@@ -49,8 +51,8 @@ module.exports = class Army {
 
     getBattleFieldSize() {
         return {
-            width: this.battleManager.battleFieldWidth,
-            height: this.battleManager.battleFieldHeight,
+            width: this.battleSimulator.battleFieldWidth,
+            height: this.battleSimulator.battleFieldHeight,
         };
     }
 }

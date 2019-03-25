@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Simulator from './Simulator';
 import FormationDesigner from './FormationDesigner';
 import { SERVER_HOST } from './Constants';
 import { renderSoldier, renderProjectile } from './SoldierRenderer';
@@ -104,6 +105,8 @@ export default class MainGame extends React.Component {
     updateBattleState(battleState) {
         this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+        console.log(battleState.red[0].position)
+
         for (const rs of battleState.red) {
             renderSoldier(this.ctx, rs, 'red');
         }
@@ -197,11 +200,15 @@ export default class MainGame extends React.Component {
                 this.setState({
                     status: 'fighting',
                 });
+
+                this.simulator = new Simulator(msg.payload.soldiers);
+                this.simulator.start(this.updateBattleState.bind(this));
+
                 break;
-            case 'battleUpdate':
-                const battleState = msg.payload.battleState;
-                this.updateBattleState(battleState);
-                break;
+            // case 'battleUpdate':
+            //     const battleState = msg.payload.battleState;
+            //     this.updateBattleState(battleState);
+            //     break;
             case 'ended':
                 this.setState({
                     status: 'ended',

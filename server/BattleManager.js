@@ -1,11 +1,11 @@
-const Army = require('./Army');
-const Soldier = require('./Soldier');
-const Horseman = require('./Horseman');
-const Map = require('./map');
+// const Army = require('./Army');
+// const Soldier = require('./Soldier');
+// const Horseman = require('./Horseman');
+// const Map = require('./map');
 // const Obstacle = require('./Obstacle');
 
-// const DEV_SP = true;
-const DEV_SP = false;
+const DEV_SP = true;
+// const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {
@@ -13,22 +13,18 @@ module.exports = class BattleManager {
 
         this.reload();
 
-        this.battleFieldWidth = 1250;
-        this.battleFieldHeight = 600;
-
         this.map = new Map();
     }
 
     reload() {
         this.ongoing = false;
-        this.redArmy = new Army('red', this);
-        this.blueArmy = new Army('blue', this);
+        this.addedSoldiers = [];
+
+        // this.redArmy = new Army('red', this);
+        // this.blueArmy = new Army('blue', this);
 
         // this.blueArmy.defensiveStance = true;
 
-        this.projectiles = [];
-        this.obstacles = [];
-        this.frame = 0;
     }
 
     rematch(username) {
@@ -128,7 +124,9 @@ module.exports = class BattleManager {
             return;
         }
 
-        this.loadSoldiers(player.playerIdx, soldiers);
+        // this.loadSoldiers(player.playerIdx, soldiers);
+
+        this.addedSoldiers[player.playerIdx] = soldiers;
 
         if (DEV_SP) { // single player dev mode
             // dummy soldiers for the dev opponent
@@ -143,31 +141,16 @@ module.exports = class BattleManager {
                     });
                 }
             }
-            this.loadSoldiers(0, soldiers);
-            // this.loadSoldiers(0, [
-            //     { x: 50, y: 100, type: 'sword' },
-            //     { x: 50, y: 200, type: 'sword' },
-            //     { x: 50, y: 300, type: 'sword' },
-            //     { x: 150, y: 100, type: 'sword' },
-            //     { x: 150, y: 200, type: 'sword' },
-            //     { x: 150, y: 300, type: 'sword' },
-            //     { x: 250, y: 100, type: 'sword' },
-            //     { x: 250, y: 200, type: 'sword' },
-            //     { x: 250, y: 300, type: 'sword' },
-            //     { x: 350, y: 100, type: 'sword' },
-            //     { x: 350, y: 200, type: 'sword' },
-            //     { x: 350, y: 300, type: 'sword' },
-            //     { x: 450, y: 100, type: 'sword' },
-            //     { x: 450, y: 200, type: 'sword' },
-            //     { x: 450, y: 300, type: 'sword' },
-            // ]);
+            // this.loadSoldiers(0, soldiers);
+            this.addedSoldiers[0] = soldiers;
 
-            this.startSimulation();
+            this.startBattle();
         } else {
             const opponentPlayer = this.getOpponentPlayer(username);
 
-            if (this.isArmyLoaded(opponentPlayer.playerIdx)) {
-                this.startSimulation();
+            // other army loaded
+            if (this.addedSoldiers[1 - player.playerIdx]) {
+                this.startBattle();
             }
         }
     }
@@ -180,39 +163,39 @@ module.exports = class BattleManager {
         }
     }
 
-    simulate() {
-        this.redArmy.simulate(this.frame, this);
-        this.blueArmy.simulate(this.frame, this);
+    // simulate() {
+    //     this.redArmy.simulate(this.frame, this);
+    //     this.blueArmy.simulate(this.frame, this);
 
-        for (const projectile of this.projectiles) {
-            projectile.simulate([...this.redArmy.soldiers, ...this.blueArmy.soldiers]);
-        }
+    //     for (const projectile of this.projectiles) {
+    //         projectile.simulate([...this.redArmy.soldiers, ...this.blueArmy.soldiers]);
+    //     }
 
-        this.projectiles = this.projectiles.filter(p => !p.defunct);
+    //     this.projectiles = this.projectiles.filter(p => !p.defunct);
 
-        const redLost = this.redArmy.soldiers.every(s => !s.alive);
-        const blueLost = this.blueArmy.soldiers.every(s => !s.alive);
+    //     const redLost = this.redArmy.soldiers.every(s => !s.alive);
+    //     const blueLost = this.blueArmy.soldiers.every(s => !s.alive);
 
-        this.frame++;
+    //     this.frame++;
 
-        const battleState = {
-            red: this.redArmy.soldiers.map(s => s.serialize()),
-            blue: this.blueArmy.soldiers.map(s => s.serialize()),
-            projectiles: this.projectiles.map(p => p.serialize()),
-        };
+    //     const battleState = {
+    //         red: this.redArmy.soldiers.map(s => s.serialize()),
+    //         blue: this.blueArmy.soldiers.map(s => s.serialize()),
+    //         projectiles: this.projectiles.map(p => p.serialize()),
+    //     };
 
-        this.broadcast('battleUpdate', { battleState });
+    //     this.broadcast('battleUpdate', { battleState });
 
-        if (redLost || blueLost) {
-            this.broadcast('ended', { winner: redLost ? 1 : 0 });
-            this.stopSimulation();
-            return;
-        }
-    }
+    //     if (redLost || blueLost) {
+    //         this.broadcast('ended', { winner: redLost ? 1 : 0 });
+    //         this.stopSimulation();
+    //         return;
+    //     }
+    // }
 
-    startSimulation() {
-        this.broadcast('battleStarted');
-        this.gameRuntime = setInterval(this.simulate.bind(this), 20);
+    startBattle() {
+        this.broadcast('battleStarted', { soldiers: this.addedSoldiers });
+        // this.gameRuntime = setInterval(this.simulate.bind(this), 20);
         this.ongoing = true;
     }
 
@@ -254,20 +237,20 @@ module.exports = class BattleManager {
         }
     }
 
-    loadSoldiers(playerIdx, soldierSpecs) {
-        const army = playerIdx === 0 ? this.redArmy : this.blueArmy;
-        const xOffset = playerIdx === 0 ? 0 : 650;
+    // loadSoldiers(playerIdx, soldierSpecs) {
+        // const army = playerIdx === 0 ? this.redArmy : this.blueArmy;
+        // const xOffset = playerIdx === 0 ? 0 : 650;
 
-        for (const s of soldierSpecs) {
-            if (s.type === 'horse') {
-                army.addSoldier(new Horseman(s.x + xOffset, s.y, this));
-            } else {
-                army.addSoldier(new Soldier(s.x + xOffset, s.y, s.type, this));
-            }
-        }
+        // for (const s of soldierSpecs) {
+        //     if (s.type === 'horse') {
+        //         army.addSoldier(new Horseman(s.x + xOffset, s.y, this));
+        //     } else {
+        //         army.addSoldier(new Soldier(s.x + xOffset, s.y, s.type, this));
+        //     }
+        // }
 
-        army.loaded = true;
-    }
+        // army.loaded = true;
+    // }
 
     addProjectile(projectile) {
         this.projectiles.push(projectile);

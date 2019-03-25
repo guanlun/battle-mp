@@ -13,7 +13,7 @@ const SOLDIER_RENDER_RADIUS = 5;
 const CHANGE_TARGET_REACTION_FRAME = 5;
 
 module.exports = class Soldier {
-    constructor(x, y, weaponType, battleManager) {
+    constructor(x, y, army, weaponType, battleSimulator) {
         this.attackInterval = 60;
         this.speedLimit = 1;
         this.dimension = 5;
@@ -25,16 +25,25 @@ module.exports = class Soldier {
             y,
         };
 
-        this.battleManager = battleManager;
+        this.army = army;
+
+        if (this.army.side === 'red') {
+            this.facing = {
+                x: 1,
+                y: 0,
+            };
+        } else {
+            this.facing = {
+                x: -1,
+                y: 0,
+            };
+        }
+
+        this.battleSimulator = battleSimulator;
 
         this.velocity = {
             x: 0,
             y: 0,
-        };
-
-        this.facing = {
-            x: 0,
-            y: -1,
         };
 
         this.state = 'moving';
@@ -261,7 +270,7 @@ module.exports = class Soldier {
     }
 
     addProjectile(projectile) {
-        this.battleManager.addProjectile(projectile);
+        this.battleSimulator.addProjectile(projectile);
     }
 
     renderAlive(ctx) {
