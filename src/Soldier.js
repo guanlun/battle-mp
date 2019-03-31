@@ -1,9 +1,9 @@
-const Utils = require('./Utils');
+import Utils from './Utils';
 
-const Sword = require('./Sword');
-const Spear = require('./Spear');
-const Shield = require('./Shield');
-const Bow = require('./Bow');
+import Sword from './Sword';
+import Spear from './Spear';
+import Shield from './Shield';
+import Bow from './Bow';
 
 const CROSS_SIZE = 5;
 
@@ -12,7 +12,7 @@ const SOLDIER_RENDER_RADIUS = 5;
 // TODO: should not change target too frequently
 const CHANGE_TARGET_REACTION_FRAME = 5;
 
-module.exports = class Soldier {
+export default class Soldier {
     constructor(x, y, army, weaponType, battleSimulator) {
         this.attackInterval = 60;
         this.speedLimit = 1;

@@ -78,7 +78,7 @@ export default class MainGame extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="game-status-item" style={this.displayStyleOfState('ready')}>
+                <div className="game-status-item" style={this.displayStyleOfState('readyToDesignFormation')}>
                     <FormationDesigner
                         playerIdx={playerIdx}
                         opponentName={opponentName}
@@ -105,8 +105,6 @@ export default class MainGame extends React.Component {
     updateBattleState(battleState) {
         this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        console.log(battleState.red[0].position)
-
         for (const rs of battleState.red) {
             renderSoldier(this.ctx, rs, 'red');
         }
@@ -118,6 +116,15 @@ export default class MainGame extends React.Component {
         for (const projectile of battleState.projectiles) {
             renderProjectile(this.ctx, projectile);
         }
+    }
+
+    handleGameEnd() {
+        const gameId = this.props.match.params.gameId;
+
+        this.wsConn.send(JSON.stringify({
+            type: 'simulationEnded',
+            payload: { gameId, username: this.username },
+        }));
     }
 
     handleJoinButtonClick() {
@@ -177,7 +184,7 @@ export default class MainGame extends React.Component {
                 break;
             case 'ready':
                 this.setState({
-                    status: 'ready',
+                    status: 'readyToDesignFormation',
                     playerIdx: msg.payload.playerIdx,
                     opponentName: msg.payload.opponentName,
                 });
@@ -201,14 +208,10 @@ export default class MainGame extends React.Component {
                     status: 'fighting',
                 });
 
-                this.simulator = new Simulator(msg.payload.soldiers);
-                this.simulator.start(this.updateBattleState.bind(this));
+                this.simulator = new Simulator(msg.payload.soldiers, msg.payload.randomSeed, this);
+                this.simulator.start();
 
                 break;
-            // case 'battleUpdate':
-            //     const battleState = msg.payload.battleState;
-            //     this.updateBattleState(battleState);
-            //     break;
             case 'ended':
                 this.setState({
                     status: 'ended',
@@ -217,7 +220,7 @@ export default class MainGame extends React.Component {
                 break;
             case 'rematchReady':
                 this.setState({
-                    status: 'ready',
+                    status: 'readyToDesignFormation',
                 });
                 break;
         }

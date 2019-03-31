@@ -1,4 +1,6 @@
-module.exports = class Utils {
+let randomSeed = undefined;
+
+export default class Utils {
     static dim(vec) {
         return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
     }
@@ -59,5 +61,15 @@ module.exports = class Utils {
             x: vec.x,
             y: vec.y,
         };
+    }
+
+    static seedRandom(seed) {
+        randomSeed = seed;
+    }
+
+    static random() {
+        let seed = randomSeed || 0;
+        const r = Math.sin(seed++) * 10000;
+        return r - Math.floor(r);
     }
 }

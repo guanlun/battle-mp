@@ -1,21 +1,25 @@
 import Army from './Army';
+import Utils from './Utils';
 
 export default class Simulator {
-  constructor(soldiers) {
+  constructor(soldiers, randomSeed, mainGame) {
     this.battleFieldWidth = 1250;
     this.battleFieldHeight = 600;
 
     this.redArmy = new Army('red', soldiers[0], this),
     this.blueArmy = new Army('blue', soldiers[1], this);
 
+    Utils.seedRandom(randomSeed);
+
     this.projectiles = [];
     this.obstacles = [];
     this.frame = 0;
+
+    this.mainGame = mainGame;
   }
 
-  start(updateCb) {
-    this.updateCb = updateCb;
-    this.gameRuntime = setInterval(this.simulate.bind(this), 20);
+  start() {
+    this.gameRuntime = setInterval(this.simulate.bind(this), 16);
   }
 
   simulate() {
@@ -34,19 +38,21 @@ export default class Simulator {
     this.frame++;
 
     const battleState = {
-        red: this.redArmy.soldiers.map(s => s.serialize()),
-        blue: this.blueArmy.soldiers.map(s => s.serialize()),
-        projectiles: this.projectiles.map(p => p.serialize()),
+        red: this.redArmy.soldiers,
+        blue: this.blueArmy.soldiers,
+        projectiles: this.projectiles,
     };
 
-    this.updateCb(battleState);
+    this.mainGame.updateBattleState(battleState);
 
-    // this.broadcast('battleUpdate', { battleState });
+    if (redLost || blueLost) {
+      clearInterval(this.gameRuntime);
 
-    // if (redLost || blueLost) {
-    //     this.broadcast('ended', { winner: redLost ? 1 : 0 });
-    //     this.stopSimulation();
-    //     return;
-    // }
+      this.mainGame.handleGameEnd();
+    }
+  }
+
+  addProjectile(projectile) {
+    this.projectiles.push(projectile);
   }
 }

@@ -1,6 +1,7 @@
-const Constants = require('./Constants');
+import Constants from './Constants';
+import Utils from './Utils';
 
-module.exports = class Weapon {
+export default class Weapon {
     constructor() {
     }
 
@@ -13,7 +14,7 @@ module.exports = class Weapon {
     defend(attackWeapon, attackAngle) {
         const blockChance = Constants.BLOCK_CHANCE[this.type];
 
-        const rand = Math.random();
+        const rand = Utils.random();
 
         if (attackAngle < blockChance.angle) { // attack is in the blocking angle of the enemy's weapon => can be blocked
             if (rand > blockChance[attackWeapon.type]) {

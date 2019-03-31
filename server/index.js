@@ -5,9 +5,6 @@ const cors = require('cors');
 
 const BattleManager = require('./BattleManager');
 
-const DEV_SP = true;
-// const DEV_SP = false;
-
 const ws = new WebSocket.Server({ port: 4001 });
 
 function joinGame(gameId, username, socket) {
@@ -27,6 +24,16 @@ function exitGame(gameId, username) {
     }
 
     game.playerExit(username);
+}
+
+function checkSimulationEnd(gameId, username) {
+    const game = games[gameId];
+
+    if (!game) {
+        return;
+    }
+
+    game.checkSimulationEnd(username);
 }
 
 function rematch(gameId, username) {
@@ -76,6 +83,9 @@ ws.on('connection', (socket, req) => {
             case 'formationComplete':
                 const { soldiers } = data.payload;
                 deployFormation(gameId, username, soldiers);
+                break;
+            case 'simulationEnded':
+                checkSimulationEnd(gameId, username);
                 break;
             case 'rematch':
                 rematch(gameId, username);

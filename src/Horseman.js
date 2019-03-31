@@ -1,10 +1,10 @@
-const Soldier = require('./Soldier');
-const Utils = require('./Utils');
+import Soldier from './Soldier';
+import Utils from './Utils';
 
 const OVERCHARGE_FRAME = 60;
 const COOLDOWN_FRAME = 20;
 
-module.exports = class Horseman extends Soldier {
+export default class Horseman extends Soldier {
     constructor(x, y, army, battleManager) {
         super(x, y, army, 'sword', battleManager);
 
@@ -123,7 +123,7 @@ module.exports = class Horseman extends Soldier {
                 if (this.attackCooldown === 0) {
                     this.speed *= 0.5;
 
-                    const rand = Math.random();
+                    const rand = Utils.random();
 
                     if (rand > 0.8) {
                         this.target.hp = 0; // Instant kill
@@ -177,7 +177,7 @@ module.exports = class Horseman extends Soldier {
     handleAttack(attackWeapon, angle, relativeClosingSpeed) {
         let damage = 0;
 
-        const rand = Math.random();
+        const rand = Utils.random();
 
         if (attackWeapon.type === 'spear') {
             if (angle < -0.7) {

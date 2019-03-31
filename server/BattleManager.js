@@ -1,11 +1,4 @@
-// const Army = require('./Army');
-// const Soldier = require('./Soldier');
-// const Horseman = require('./Horseman');
-// const Map = require('./map');
-// const Obstacle = require('./Obstacle');
-
-const DEV_SP = true;
-// const DEV_SP = false;
+const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {
@@ -19,12 +12,20 @@ module.exports = class BattleManager {
     reload() {
         this.ongoing = false;
         this.addedSoldiers = [];
+    }
 
-        // this.redArmy = new Army('red', this);
-        // this.blueArmy = new Army('blue', this);
+    checkSimulationEnd(username) {
+        this.players[username].ended = true;
 
-        // this.blueArmy.defensiveStance = true;
+        const opponentPlayer = this.getOpponentPlayer(username);
 
+        if (DEV_SP) {
+            opponentPlayer.ended = true;
+        }
+
+        if (opponentPlayer.ended) {
+            this.broadcast('ended');
+        }
     }
 
     rematch(username) {
@@ -137,7 +138,7 @@ module.exports = class BattleManager {
                     soldiers.push({
                         x: 300 + i * 20,
                         y: 200 + j * 30,
-                        type: 'sword',
+                        type: 'bow',
                     });
                 }
             }
@@ -194,17 +195,9 @@ module.exports = class BattleManager {
     // }
 
     startBattle() {
-        this.broadcast('battleStarted', { soldiers: this.addedSoldiers });
-        // this.gameRuntime = setInterval(this.simulate.bind(this), 20);
+        const randomSeed = Math.round(Math.random() * 1000);
+        this.broadcast('battleStarted', { randomSeed, soldiers: this.addedSoldiers });
         this.ongoing = true;
-    }
-
-    stopSimulation() {
-        this.reload();
-        for (const username of Object.keys(this.players)) {
-            this.players[username].ended = true;
-        }
-        clearInterval(this.gameRuntime);
     }
 
     sendMessage(player, type, payload = {}) {
@@ -251,10 +244,6 @@ module.exports = class BattleManager {
 
         // army.loaded = true;
     // }
-
-    addProjectile(projectile) {
-        this.projectiles.push(projectile);
-    }
 
     isArmyLoaded(playerIdx) {
         const army = playerIdx === 0 ? this.redArmy : this.blueArmy;

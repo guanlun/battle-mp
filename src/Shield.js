@@ -1,7 +1,7 @@
-const Utils = require('./Utils');
-const Weapon = require('./Weapon');
+import Utils from './Utils';
+import Weapon from './Weapon';
 
-module.exports = class Shield extends Weapon {
+export default class Shield extends Weapon {
     constructor() {
         super();
 

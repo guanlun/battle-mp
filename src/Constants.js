@@ -36,3 +36,5 @@ export const BLOCK_CHANCE = {
       arrow: 0.1,
   }
 };
+
+export default { SERVER_HOST, BLOCK_CHANCE };

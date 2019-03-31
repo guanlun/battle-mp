@@ -1,6 +1,6 @@
 const mountainImage = document.getElementById('mountain');
 
-module.exports = class Obstacle {
+export default class Obstacle {
     constructor(x, y, radius) {
         this.position = {
             x: x,

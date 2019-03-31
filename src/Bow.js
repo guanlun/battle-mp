@@ -1,6 +1,6 @@
-const Utils = require('./Utils');
-const Arrow = require('./Arrow');
-const Constants = require('./Constants');
+import Utils from './Utils';
+import Arrow from './Arrow';
+import Constants from './Constants';
 
 const DRAW_DISTANCE = 8;
 const DRAW_TIME = 8;
@@ -8,7 +8,7 @@ const LOOSE_TIME = 4;
 const DRAW_AMOUNT_PER_FRAME = DRAW_DISTANCE / DRAW_TIME;
 const LOOSE_AMOUNT_PER_FRAME = DRAW_DISTANCE / LOOSE_TIME;
 
-module.exports = class Bow {
+export default class Bow {
     constructor(holder) {
         this.holder = holder;
 
@@ -82,7 +82,7 @@ module.exports = class Bow {
     defend(attackWeapon, attackAngle) {
         const blockChance = Constants.BLOCK_CHANCE[this.type];
 
-        const rand = Math.random();
+        const rand = Utils.random();
 
         if (attackAngle < blockChance.angle) {
             if (rand > blockChance[attackWeapon.type]) {

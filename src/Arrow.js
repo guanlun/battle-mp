@@ -1,9 +1,8 @@
-const Utils = require('./Utils');
-const Constants = require('./Constants');
+import Utils from './Utils';
 
 const ARROW_SPEED = 12;
 
-module.exports = class Arrow {
+export default class Arrow {
     constructor(position, facing, side, shooter) {
         this.shot = false;
         this.defunct = false;
@@ -74,7 +73,7 @@ module.exports = class Arrow {
 
     shoot(direction, targetDistance) {
         const errorAmount = 0.04;
-        const erroredDirection = direction + (Math.random() * errorAmount - errorAmount / 2);
+        const erroredDirection = direction + (Utils.random() * errorAmount - errorAmount / 2);
 
         this.velocity = {
             x: Math.sin(erroredDirection) * ARROW_SPEED,
