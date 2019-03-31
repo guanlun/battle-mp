@@ -14,7 +14,7 @@ export function renderSoldier(ctx, soldier, color) {
 
     ctx.beginPath();
     if (soldier.alive) {
-        if (soldier.weapon.type === 'horse') {
+        if (soldier.isHorseman) {
             renderHorseman(ctx, soldier);
         } else {
             renderFootman(ctx, soldier);

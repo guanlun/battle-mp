@@ -1,4 +1,4 @@
-let randomSeed = undefined;
+let randomSeed = 0;
 
 export default class Utils {
     static dim(vec) {
@@ -68,8 +68,7 @@ export default class Utils {
     }
 
     static random() {
-        let seed = randomSeed || 0;
-        const r = Math.sin(seed++) * 10000;
+        const r = Math.sin(randomSeed++) * 10000;
         return r - Math.floor(r);
     }
 }

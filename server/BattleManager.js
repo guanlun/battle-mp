@@ -1,4 +1,4 @@
-const DEV_SP = false;
+const DEV_SP = true;
 
 module.exports = class BattleManager {
     constructor() {
@@ -38,6 +38,7 @@ module.exports = class BattleManager {
         }
 
         if (!opponentPlayer.ended) {
+            this.reload();
             this.broadcast('rematchReady');
         }
     }
@@ -164,36 +165,6 @@ module.exports = class BattleManager {
         }
     }
 
-    // simulate() {
-    //     this.redArmy.simulate(this.frame, this);
-    //     this.blueArmy.simulate(this.frame, this);
-
-    //     for (const projectile of this.projectiles) {
-    //         projectile.simulate([...this.redArmy.soldiers, ...this.blueArmy.soldiers]);
-    //     }
-
-    //     this.projectiles = this.projectiles.filter(p => !p.defunct);
-
-    //     const redLost = this.redArmy.soldiers.every(s => !s.alive);
-    //     const blueLost = this.blueArmy.soldiers.every(s => !s.alive);
-
-    //     this.frame++;
-
-    //     const battleState = {
-    //         red: this.redArmy.soldiers.map(s => s.serialize()),
-    //         blue: this.blueArmy.soldiers.map(s => s.serialize()),
-    //         projectiles: this.projectiles.map(p => p.serialize()),
-    //     };
-
-    //     this.broadcast('battleUpdate', { battleState });
-
-    //     if (redLost || blueLost) {
-    //         this.broadcast('ended', { winner: redLost ? 1 : 0 });
-    //         this.stopSimulation();
-    //         return;
-    //     }
-    // }
-
     startBattle() {
         const randomSeed = Math.round(Math.random() * 1000);
         this.broadcast('battleStarted', { randomSeed, soldiers: this.addedSoldiers });
@@ -229,21 +200,6 @@ module.exports = class BattleManager {
             }
         }
     }
-
-    // loadSoldiers(playerIdx, soldierSpecs) {
-        // const army = playerIdx === 0 ? this.redArmy : this.blueArmy;
-        // const xOffset = playerIdx === 0 ? 0 : 650;
-
-        // for (const s of soldierSpecs) {
-        //     if (s.type === 'horse') {
-        //         army.addSoldier(new Horseman(s.x + xOffset, s.y, this));
-        //     } else {
-        //         army.addSoldier(new Soldier(s.x + xOffset, s.y, s.type, this));
-        //     }
-        // }
-
-        // army.loaded = true;
-    // }
 
     isArmyLoaded(playerIdx) {
         const army = playerIdx === 0 ? this.redArmy : this.blueArmy;

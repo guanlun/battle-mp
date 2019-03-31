@@ -54,6 +54,7 @@ export function renderSoidierAdpter(ctx, soldier, side) {
         dimension: 5,
         alive: true,
         weapon: WEAPON_SPEC[soldier.type],
+        isHorseman: soldier.type === 'horse',
     };
 
     renderSoldier(ctx, soldierSpec, side);
