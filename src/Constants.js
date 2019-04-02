@@ -1,6 +1,6 @@
 import { ENV } from './Env';
 
-export const SERVER_HOST = (ENV === 'prod') ? '18.218.172.215' : 'localhost';
+export const SERVER_HOST = (ENV === 'prod') ? '35.185.199.3' : 'localhost';
 
 export const BLOCK_CHANCE = {
   sword: {

@@ -1,4 +1,4 @@
-const DEV_SP = true;
+const DEV_SP = false;
 
 module.exports = class BattleManager {
     constructor() {
