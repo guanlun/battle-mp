@@ -87,13 +87,16 @@ export default class MainGame extends React.Component {
                 <div className="game-status-item" style={this.displayStyleOfState('deployed')}>
                     Waiting for the enemy to deploy
                 </div>
-                <div className="game-status-item" style={this.displayStyleOfState('fighting', 'ended')}>
+                <div className="game-status-item" style={this.displayStyleOfState('fighting', 'ended', 'waitingForOpponentRematch')}>
                     <canvas ref="battleCanvas" width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-                    <div style={this.displayStyleOfState('ended')}>
+                    <div style={this.displayStyleOfState('ended', 'waitingForOpponentRematch')}>
                         <div className="game-ended-overlay">
                             <div className="game-menu">
                                 <h3>Game Ended</h3>
                                 <button onClick={this.handleRematchButtonClick.bind(this)}>Rematch</button>
+                                <div style={this.displayStyleOfState('waitingForOpponentRematch')}>
+                                    Waiting for opponent to click rematch
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -165,6 +168,10 @@ export default class MainGame extends React.Component {
 
     handleRematchButtonClick() {
         const gameId = this.props.match.params.gameId;
+
+        this.setState({
+            status: 'waitingForOpponentRematch',
+        });
 
         this.wsConn.send(JSON.stringify({
             type: 'rematch',
