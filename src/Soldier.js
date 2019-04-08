@@ -58,11 +58,11 @@ export default class Soldier {
         switch (weaponType) {
             case 'sword':
                 this.weapon = new Sword(this);
-                this.maxMovingSpeed = 0.8;
+                this.maxMovingSpeed = 0.7;
                 break;
             case 'spear':
                 this.weapon = new Spear(this);
-                this.maxMovingSpeed = 0.5;
+                this.maxMovingSpeed = 0.6;
                 break;
             case 'shield':
                 this.weapon = new Shield(this);
@@ -70,12 +70,12 @@ export default class Soldier {
                 break;
             case 'bow':
                 this.weapon = new Bow(this);
-                this.maxMovingSpeed = 0.5;
+                this.maxMovingSpeed = 0.6;
                 break;
         }
     }
 
-    simulate(frame, friendly, enemy, obstacles, isDefending = false) {
+    simulate(frame, friendly, enemy, isDefending = false) {
         if (!this.alive) {
             return;
         }
@@ -88,49 +88,8 @@ export default class Soldier {
 
         const dist = this.distTo(target);
 
-        let newFacingX, newFacingY;
-
-        let obstacleApproaching = false;
-
-        if (!Utils.isZeroVec(this.velocity)) {
-            for (let oi = 0; oi < obstacles.length; oi++) {
-                const o = obstacles[oi];
-
-                const vecToObstacleCenter = Utils.sub(o.position, this.position);
-
-                const movingDir = Utils.normalize(this.velocity);
-                const closingDist = Utils.dot(vecToObstacleCenter, movingDir);
-
-                if (closingDist < 0 || closingDist > o.radius) {
-                    continue;
-                }
-
-                const closestPosition = Utils.add(this.position, Utils.scalarMult(closingDist, movingDir));
-                const outwardDir = Utils.sub(closestPosition, o.position);
-                const closestDistToCenter = Utils.dim(outwardDir);
-
-                if (closestDistToCenter > o.radius) {
-                    continue;
-                }
-
-                const outwardUnitDir = Utils.normalize(outwardDir);
-                const turningTargetPosition = Utils.add(o.position, Utils.scalarMult(o.radius, outwardUnitDir));
-
-                const turiningDirection = Utils.sub(turningTargetPosition, this.position);
-
-                newFacingX = turiningDirection.x;
-                newFacingY = turiningDirection.y;
-
-                obstacleApproaching = true;
-
-                break;
-            }
-        }
-
-        if (!obstacleApproaching) {
-            newFacingX = (target.position.x - this.position.x) / dist;
-            newFacingY = (target.position.y - this.position.y) / dist;
-        }
+        const newFacingX = (target.position.x - this.position.x) / dist;
+        const newFacingY = (target.position.y - this.position.y) / dist;
 
         const newFacingAngle = Math.atan2(newFacingY, newFacingX);
         let currFacingAngle = Math.atan2(this.facing.y, this.facing.x);

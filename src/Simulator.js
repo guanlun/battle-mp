@@ -12,7 +12,6 @@ export default class Simulator {
     Utils.seedRandom(randomSeed);
 
     this.projectiles = [];
-    this.obstacles = [];
     this.frame = 0;
 
     this.mainGame = mainGame;

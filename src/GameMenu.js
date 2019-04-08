@@ -15,9 +15,6 @@ export default class GameMenu extends React.Component {
                     <div className="game-menu-field">
                         <button onClick={this.handleCreateGameButtonClick.bind(this)}>Create Game</button>
                     </div>
-                    <div className="game-menu-field">
-                        <button>Join Game</button>
-                    </div>
                 </div>
             </div>
         )

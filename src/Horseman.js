@@ -23,7 +23,7 @@ export default class Horseman extends Soldier {
         this.hp = 100;
     }
 
-    simulate(frame, friendly, enemy, obstacles) {
+    simulate(frame, friendly, enemy) {
         if (!this.alive) {
             return;
         }
@@ -32,62 +32,23 @@ export default class Horseman extends Soldier {
 
         let newFacingX, newFacingY;
 
-        let obstacleApproaching = false;
-
-        if (!Utils.isZeroVec(this.velocity)) {
-            for (let oi = 0; oi < obstacles.length; oi++) {
-                const o = obstacles[oi];
-
-                const vecToObstacleCenter = Utils.sub(o.position, this.position);
-
-                const movingDir = Utils.normalize(this.velocity);
-                const closingDist = Utils.dot(vecToObstacleCenter, movingDir);
-
-                if (closingDist < 0 || closingDist > o.radius) {
-                    continue;
-                }
-
-                const closestPosition = Utils.add(this.position, Utils.scalarMult(closingDist, movingDir));
-                const outwardDir = Utils.sub(closestPosition, o.position);
-                const closestDistToCenter = Utils.dim(outwardDir);
-
-                if (closestDistToCenter > o.radius) {
-                    continue;
-                }
-
-                const outwardUnitDir = Utils.normalize(outwardDir);
-                const turningTargetPosition = Utils.add(o.position, Utils.scalarMult(o.radius, outwardUnitDir));
-
-                const turiningDirection = Utils.sub(turningTargetPosition, this.position);
-
-                newFacingX = turiningDirection.x;
-                newFacingY = turiningDirection.y;
-
-                obstacleApproaching = true;
-
-                break;
-            }
-        }
-
-        if (!obstacleApproaching) {
-            if (target === null) {
-                if (this.overcharge === 0) {
-                    newFacingX = -this.facing.y;
-                    newFacingY = this.facing.x;
-                } else {
-                    newFacingX = this.facing.x;
-                    newFacingY = this.facing.y;
-
-                    this.overcharge--;
-                }
+        if (target === null) {
+            if (this.overcharge === 0) {
+                newFacingX = -this.facing.y;
+                newFacingY = this.facing.x;
             } else {
-                const dist = this.distTo(target);
+                newFacingX = this.facing.x;
+                newFacingY = this.facing.y;
 
-                newFacingX = (target.position.x - this.position.x) / dist;
-                newFacingY = (target.position.y - this.position.y) / dist;
-
-                this.overcharge = OVERCHARGE_FRAME;
+                this.overcharge--;
             }
+        } else {
+            const dist = this.distTo(target);
+
+            newFacingX = (target.position.x - this.position.x) / dist;
+            newFacingY = (target.position.y - this.position.y) / dist;
+
+            this.overcharge = OVERCHARGE_FRAME;
         }
 
         const newFacingAngle = Math.atan2(newFacingY, newFacingX);

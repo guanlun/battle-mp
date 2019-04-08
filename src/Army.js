@@ -19,9 +19,9 @@ export default class Army {
     simulate(frame, state) {
         this.soldiers.forEach(s => {
             if (this.side === 'red') {
-                s.simulate(frame, this, state.blueArmy, state.obstacles, this.defensiveStance);
+                s.simulate(frame, this, state.blueArmy, this.defensiveStance);
             } else {
-                s.simulate(frame, this, state.redArmy, state.obstacles, this.defensiveStance);
+                s.simulate(frame, this, state.redArmy, this.defensiveStance);
             }
         });
     }

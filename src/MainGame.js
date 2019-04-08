@@ -73,7 +73,7 @@ export default class MainGame extends React.Component {
                                 </button>
                             </div>
                             <div className="game-menu-field game-status-item" style={this.opacityStyleOfState('waiting')}>
-                                Waiting for the other player to join
+                                Waiting for the opponent to join
                             </div>
                         </div>
                     </div>
@@ -85,7 +85,7 @@ export default class MainGame extends React.Component {
                         onFormationComplete={this.handleFormationComplete.bind(this)} />
                 </div>
                 <div className="game-status-item" style={this.displayStyleOfState('deployed')}>
-                    Waiting for the enemy to deploy
+                    Waiting for the opponent to deploy
                 </div>
                 <div className="game-status-item" style={this.displayStyleOfState('fighting', 'ended', 'waitingForOpponentRematch')}>
                     <canvas ref="battleCanvas" width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
