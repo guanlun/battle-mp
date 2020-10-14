@@ -3,6 +3,7 @@ const DEV_SP = false;
 module.exports = class BattleManager {
     constructor() {
         this.players = {};
+        this.watchers = {};
 
         this.reload();
 
@@ -79,6 +80,10 @@ module.exports = class BattleManager {
         } else {
             // player with this username does not exist
             if (Object.keys(this.players).length >= 2) {
+                this.watchers[username] = {
+                    username,
+                    socket,
+                };
                 socket.send(JSON.stringify({ type: 'maxPlayerNum'}))
                 return;
             }
@@ -193,8 +198,9 @@ module.exports = class BattleManager {
     }
 
     broadcast(type, payload) {
-        for (const username of Object.keys(this.players)) {
-            const player = this.players[username];
+        const subscribers = {...this.players, ...this.watchers};
+        for (const username of Object.keys(subscribers)) {
+            const player = subscribers[username];
             if (!player.exited && player.socket) {
                 this.sendMessage(player, type, payload);
             }

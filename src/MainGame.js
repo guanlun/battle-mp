@@ -15,6 +15,7 @@ export default class MainGame extends React.Component {
             status: 'none',
             playerIdx: null,
             opponentName: '',
+            isWatcher: false,
         };
     }
 
@@ -84,6 +85,9 @@ export default class MainGame extends React.Component {
                         opponentName={opponentName}
                         onFormationComplete={this.handleFormationComplete.bind(this)} />
                 </div>
+                <div className="game-status-item" style={this.displayStyleOfState('waitingToWatch')}>
+                    Waiting for players to deploy
+                </div>
                 <div className="game-status-item" style={this.displayStyleOfState('deployed')}>
                     Waiting for the opponent to deploy
                 </div>
@@ -124,10 +128,12 @@ export default class MainGame extends React.Component {
     handleGameEnd() {
         const gameId = this.props.match.params.gameId;
 
-        this.wsConn.send(JSON.stringify({
-            type: 'simulationEnded',
-            payload: { gameId, username: this.username },
-        }));
+        if (!this.state.isWatcher) {
+            this.wsConn.send(JSON.stringify({
+                type: 'simulationEnded',
+                payload: { gameId, username: this.username },
+            }));
+        }
     }
 
     handleJoinButtonClick() {
@@ -200,7 +206,11 @@ export default class MainGame extends React.Component {
                 alert('This username has been taken');
                 break;
             case 'maxPlayerNum':
-                alert('Max player number reached');
+                alert('Max player number reached, joining as watcher');
+                this.setState({
+                    status: 'waitingToWatch',
+                    isWatcher: true,
+                });
                 break;
             case 'opponentExit':
                 alert('opponent left')
