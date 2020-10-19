@@ -1,1 +1,1 @@
-export const ENV = "prod";
+module.exports = { ENV: "prod" };
