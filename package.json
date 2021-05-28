@@ -13,7 +13,7 @@
     "react-scripts": "1.1.4",
     "request": "^2.85.0",
     "seed-random": "^2.2.0",
-    "ws": "^5.1.1"
+    "ws": "^7.4.5"
   },
   "scripts": {
     "start": "react-scripts start",
